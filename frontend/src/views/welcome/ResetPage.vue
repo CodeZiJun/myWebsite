@@ -1,6 +1,6 @@
 <script setup>
 
-import {computed, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import {Lock, Message, Promotion} from "@element-plus/icons-vue";
 import {get, post} from "@/net";
 import {ElMessage} from "element-plus";
@@ -98,6 +98,18 @@ function doReset() {
   })
 }
 
+onMounted(() => {
+  window.addEventListener("keydown", enterDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", enterDown, false)
+})
+function enterDown(e) {
+  if (e.keyCode === 13) {
+    doReset()
+  }
+}
 </script>
 
 <template>
@@ -176,7 +188,7 @@ function doReset() {
       </div>
 
       <div>
-        <el-button @click="doReset" type="danger" style="width: 300px; margin-top: 30px" plain>立即重置</el-button>
+        <el-button @click="doReset" @keydown.enter="doReset" type="danger" style="width: 300px; margin-top: 30px" plain>立即重置</el-button>
       </div>
 
     </div>

@@ -1,5 +1,5 @@
 <script setup>
-import {computed, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import {Lock, Message, Promotion, User} from "@element-plus/icons-vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";
@@ -89,6 +89,19 @@ function register() {
   })
 }
 
+onMounted(() => {
+  window.addEventListener("keydown", enterDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", enterDown, false)
+})
+function enterDown(e) {
+  if (e.keyCode === 13) {
+    register()
+  }
+}
+
 </script>
 
 <template>
@@ -152,7 +165,7 @@ function register() {
     </div>
 
     <div style="margin-top: 60px">
-      <el-button @click="register" type="success" style="width: 300px">立即注册</el-button>
+      <el-button @click="register" @keydown.enter="enterDown" type="success" style="width: 300px">立即注册</el-button>
     </div>
 
     <div style="margin-top: 20px">

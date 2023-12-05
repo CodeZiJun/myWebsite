@@ -1,5 +1,5 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive, ref, onMounted, onUnmounted} from "vue";
 import { User, Lock } from '@element-plus/icons-vue'
 import {login} from "@/net";
 import router from "@/router";
@@ -22,11 +22,27 @@ const rule = {
 }
 
 function userLogin() {
-  formRef.value.validate((valid) => {
-    if(valid) {
-      login(form.username, form.password, form.remember, () => {router.push('/index')})
-    }
-  })
+  if (formRef.value != null){
+    formRef.value.validate((valid) => {
+      if(valid) {
+        login(form.username, form.password, form.remember, () => {router.push('/index')})
+      }
+    })
+  }
+
+}
+
+onMounted(() => {
+    window.addEventListener("keydown", enterDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", enterDown, false)
+})
+function enterDown(e) {
+  if (e.keyCode === 13) {
+    userLogin()
+  }
 }
 </script>
 
@@ -71,7 +87,7 @@ function userLogin() {
     </div>
 
     <div style="margin-top: 40px">
-      <el-button @click="userLogin" style="width: 270px" type="success" plain>立即登录</el-button>
+      <el-button @click="userLogin" @keydown.enter="enterDown" style="width: 270px" type="success" plain>立即登录</el-button>
     </div>
     <el-divider>
       <span style="font-size: 13px; color: grey">新用户没有账号?</span>
