@@ -18,3 +18,12 @@ spring:
     username: root
     password: LZJ20040112
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mvc:
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/
+
+uploadFile:
+  path: C:/Users/13919/Desktop/Project/JavaWeb/myWebsite/resource/upload/
+  maxSize: 50

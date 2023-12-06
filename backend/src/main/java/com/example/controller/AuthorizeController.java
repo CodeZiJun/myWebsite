@@ -1,5 +1,4 @@
 package com.example.controller;
-
 import com.example.entity.RestBean;
 import com.example.entity.vo.request.ConfirmResetVO;
 import com.example.entity.vo.request.EmailRegisterVO;
@@ -12,7 +11,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.function.Supplier;
 
 @Validated

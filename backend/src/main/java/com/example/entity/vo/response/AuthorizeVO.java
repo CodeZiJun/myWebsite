@@ -12,4 +12,7 @@ public class AuthorizeVO {
     String role;
     String token;
     Date expire;
+    String email;
+    Date registerDate;
+    String avatar;
 }

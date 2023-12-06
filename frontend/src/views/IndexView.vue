@@ -1,6 +1,7 @@
 <script setup>
-import {logout} from "@/net";
+import {accountInfoItemName, logout} from "@/net";
 import router from "@/router";
+import {avatarRef} from '@/utils/profileUtils'
 import {
   ArrowRight,
   Avatar, CreditCard,
@@ -16,6 +17,7 @@ import {useRoute, useRouter} from "vue-router";
 import {getDescriptions, getNames} from "@/utils/routeUtils";
 import {ref} from "vue";
 import screenfull from "screenfull";
+import {baseUrl} from "@/main";
 
 
 const route = useRoute()
@@ -23,6 +25,10 @@ let descriptions = ref()
 let routeNames = ref()
 let isCollapse = ref(false);
 let asideWidth = ref('200px');
+
+const accountInfo = JSON.parse(
+    (sessionStorage.getItem(accountInfoItemName) ? sessionStorage.getItem(accountInfoItemName)
+        : localStorage.getItem(accountInfoItemName))).username
 //获取面包屑数据
 routeNames.value = getNames(route.name, router.getRoutes())
 descriptions.value = getDescriptions(routeNames.value, router.getRoutes())
@@ -172,9 +178,9 @@ router.afterEach((to, from) => {
                    @click="screenfull.toggle()"><FullScreen /></el-icon>
           <el-dropdown placement="bottom">
             <div style="display: flex; align-items: center; cursor: default">
-              <img src="@/assets/IndexUserHead.png"
+              <img :src=avatarRef
                    alt="" style="width: 40px; height: 40px; border-radius: 50%; margin: 0 5px" />
-              <span>UserName</span>
+              <span>{{ accountInfo }}</span>
             </div>
             <template #dropdown>
               <el-dropdown-menu slot="dropdown" style="user-select: none">
@@ -187,7 +193,11 @@ router.afterEach((to, from) => {
       </el-header>
 
       <el-main>
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <transition name="el-fade-in-linear" mode="out-in">
+            <component :is="Component"/>
+          </transition>
+        </router-view>
       </el-main>
     </el-container>
   </el-container>

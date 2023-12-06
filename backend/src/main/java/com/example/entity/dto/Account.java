@@ -19,4 +19,5 @@ public class Account {
     String email;
     String role;
     Date registerTime;
+    String avatar;
 }

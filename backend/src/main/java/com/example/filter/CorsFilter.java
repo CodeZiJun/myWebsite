@@ -29,4 +29,6 @@ public class CorsFilter extends HttpFilter {
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.addHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
     }
+
+
 }

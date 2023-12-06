@@ -19,6 +19,7 @@
     "jszip-utils": "^0.1.0",
     "screenfull": "^6.0.2",
     "vue": "^3.3.4",
+    "vue-cropper": "^1.1.1",
     "vue-demi": "^0.13.11",
     "vue-router": "^4.2.5"
   },

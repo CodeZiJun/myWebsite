@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 public class SecurityConfiguration {
     @Resource
     JwtUtils jwtUtils;
+
     @Resource
     JwtAuthorizeFilter jwtAuthorizeFilter;
 
@@ -39,7 +40,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeHttpRequests(conf -> conf
-                        .requestMatchers("/api/auth/**", "/error").permitAll() //放行该url下的api请求
+                        .requestMatchers("/api/auth/**", "/error", "/image/**").permitAll() //放行该url下的api请求
                         .anyRequest().authenticated()                  //除放行请求外均要通过验证
                 )
                 .formLogin(conf -> conf
@@ -76,12 +77,15 @@ public class SecurityConfiguration {
         vo.setRole(account.getRole());
         vo.setToken(token);
         vo.setUsername(account.getUsername());
+        vo.setEmail(account.getEmail());
+        vo.setRegisterDate(account.getRegisterTime());
+        vo.setAvatar(account.getAvatar());
         response.getWriter().write(RestBean.success(vo).toJsonString());
     }
 
     public void onLogoutSuccess(HttpServletRequest request,
                                 HttpServletResponse response,
-                                Authentication authentication) throws IOException, ServletException {
+                                Authentication authentication) throws IOException {
         response.setContentType("application/json;charset=utf-8");
         PrintWriter writer = response.getWriter();
         String authorization = request.getHeader("Authorization");
@@ -110,8 +114,9 @@ public class SecurityConfiguration {
 
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
+                                        AuthenticationException exception) throws IOException {
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(RestBean.unauthorized(exception.getMessage()).toJsonString());
     }
 }
+

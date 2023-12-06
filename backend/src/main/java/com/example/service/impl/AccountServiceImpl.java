@@ -3,6 +3,7 @@ package com.example.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
+import com.example.entity.dto.UploadFile;
 import com.example.entity.vo.request.ConfirmResetVO;
 import com.example.entity.vo.request.EmailRegisterVO;
 import com.example.entity.vo.request.EmailResetVO;
@@ -10,14 +11,18 @@ import com.example.mapper.AccountMapper;
 import com.example.service.AccountService;
 import com.example.utils.Const;
 import com.example.utils.FlowUtils;
+import com.example.utils.UploadFileUtils;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Map;
@@ -29,7 +34,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Resource
     FlowUtils flowUtils;
-
+    @Resource
+    UploadFileUtils uploadFileUtils;
     @Resource
     AmqpTemplate amqpTemplate;
 
@@ -88,7 +94,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (this.existsAccountByEmail(email)) return "此电子邮箱已被注册！";
         if (this.existsAccountByUsername(username)) return "此用户名已被注册！";
         String password = encoder.encode(vo.getPassword());
-        Account account = new Account(null, username, password, email, "user", new Date());
+        Account account = new Account(null, username, password, email, "user", new Date(), null);
         if (this.save(account)) {
             stringRedisTemplate.delete(key);
             return null;
@@ -119,6 +125,18 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         return null;
     }
 
+    @Override
+    public String  updateAvatar(MultipartFile file) {
+        Account account = getCurrentLoginUser();
+        UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(),file);
+        account.setAvatar(uploadFile.getType() + "/" + uploadFile.getFileName());
+        boolean update = this.update().eq("email",account.getEmail()).set("avatar", account.getAvatar()).update();
+        if(update)
+            return null;
+        else
+            return "内部错误，请联系管理员";
+    }
+
     private boolean verifyLimit(String ip) {
         String key = Const.VERIFY_EMAIL_LIMIT + ip;
         return flowUtils.limitOnceCheck(key, 60);
@@ -130,5 +148,18 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     private boolean existsAccountByUsername(String username) {
         return this.baseMapper.exists(Wrappers.<Account>query().eq("username", username));
+    }
+
+    //获取当前用户信息
+    public Account getCurrentLoginUser() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null){
+            throw new RuntimeException("登录状态已过期");
+        }
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return findByNameOrEmail(userDetails.getUsername());
+        }
+        throw new RuntimeException("找不到当前登录信息");
     }
 }

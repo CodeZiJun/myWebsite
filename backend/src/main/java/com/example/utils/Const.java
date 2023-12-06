@@ -16,4 +16,8 @@ public class Const {
     public static final String FLOW_LIMIT_COUNTER = "flow:counter:";
 
     public static final String FLOW_LIMIT_BLOCK = "flow:block:";
+
+    public static final int MB = 1024 * 1024;
+
+
 }

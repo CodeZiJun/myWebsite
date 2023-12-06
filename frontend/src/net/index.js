@@ -2,7 +2,7 @@ import axios from "axios"
 import {ElMessage} from "element-plus";
 
 const authItemName = "access_token"
-
+const accountInfoItemName = "account_item"
 const defaultFailure = (message, code, url) => {
     console.warn(`请求地址: ${url}, 状态码: ${code}, 错误信息: ${message}`)
     ElMessage.warning(message)
@@ -43,6 +43,21 @@ function storeAccessToken(token, remember, expire) {
         localStorage.setItem(authItemName, str)
     else
         sessionStorage.setItem(authItemName, str)
+}
+
+function storeAccountInfo(avatar, email, registerDate, username, remember) {
+    const accountObj = {
+        avatar: avatar,
+        email: email,
+        registerDate: registerDate,
+        username: username
+    }
+    const str = JSON.stringify(accountObj)
+    if(remember)
+        localStorage.setItem(accountInfoItemName, str)
+    else
+        sessionStorage.setItem(accountInfoItemName, str)
+
 }
 
 function deleteAccessToken() {
@@ -90,6 +105,7 @@ function login(username, password, remember, success, failure = defaultFailure) 
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
         storeAccessToken(data.token, remember, data.expire)
+        storeAccountInfo(data.avatar, data.email, data.registerDate, data.username)
         ElMessage.success(`登录成功，欢迎${username}`)
         success(data)
     }, failure)
@@ -108,4 +124,4 @@ function unauthorized() {
     return !takeAccessToken()
 }
 
-export {login, logout, get, post, unauthorized}
+export {login, logout, get, post, unauthorized, accountInfoItemName}

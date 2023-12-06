@@ -162,7 +162,42 @@ const router = createRouter({
                         description: '我的资料',
                         parentRouteName: 'index'
                     },
-                    component: () => import('@/views/index/userData/Profile.vue')
+                    component: () => import('@/views/index/userData/Profile.vue'),
+                    children: [
+                        {
+                            path: '',
+                            name: 'index-profile-myInfo',
+                            meta: {
+                                description: '我的信息',
+                                parentRouteName: 'index-profile'
+                            },
+                            component: () => import('@/views/index/userData/profileCard/myInfo.vue')
+                        }, {
+                            path: 'avatar',
+                            name: 'index-profile-updateAvatar',
+                            meta: {
+                                description: '设置头像',
+                                parentRouteName: 'index-profile'
+                            },
+                            component: () => import('@/views/index/userData/profileCard/updateAvatar.vue')
+                        }, {
+                            path: 'resetPassword',
+                            name: 'index-profile-resetPassword',
+                            meta: {
+                                description: '修改密码',
+                                parentRouteName: 'index-profile'
+                            },
+                            component: () => import('@/views/index/userData/profileCard/resetPassword.vue')
+                        }, {
+                            path: 'modifyInfo',
+                            name: 'index-profile-modifyInfo',
+                            meta: {
+                                description: '修改资料',
+                                parentRouteName: 'index-profile'
+                            },
+                            component: () => import('@/views/index/userData/profileCard/modifyInfo.vue')
+                        }
+                    ]
                 }
             ]
         }
