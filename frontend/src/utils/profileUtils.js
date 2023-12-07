@@ -12,3 +12,8 @@ export function getAavater() {
         return baseUrl + "/" + avatar
 }
 export let avatarRef = ref(getAavater())
+
+export function getStorageInfoJson() {
+    return localStorage.getItem(accountInfoItemName) ? JSON.parse(localStorage.getItem(accountInfoItemName)) :
+                                                JSON.parse(sessionStorage.getItem(accountInfoItemName))
+}

@@ -188,14 +188,6 @@ const router = createRouter({
                                 parentRouteName: 'index-profile'
                             },
                             component: () => import('@/views/index/userData/profileCard/resetPassword.vue')
-                        }, {
-                            path: 'modifyInfo',
-                            name: 'index-profile-modifyInfo',
-                            meta: {
-                                description: '修改资料',
-                                parentRouteName: 'index-profile'
-                            },
-                            component: () => import('@/views/index/userData/profileCard/modifyInfo.vue')
                         }
                     ]
                 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import router from "@/router";
 let currentDate = ref(new Date())
 setInterval(() => {
@@ -9,12 +9,10 @@ setInterval(() => {
 
 const activeName = ref('first')
 
-function handleClick(tab, event) {
+function handleClick(tab) {
   if (tab.paneName === "second")
     router.push('/index/profile/resetPassword')
   else if (tab.paneName === "third")
-    router.push('/index/profile/modifyInfo')
-  else if (tab.paneName === "forth")
     router.push('/index/profile/avatar')
   else
     router.push('/index/profile/')
@@ -30,8 +28,7 @@ function handleClick(tab, event) {
             <el-tabs v-model="activeName" class="tabs" type="card" @tab-click="handleClick">
               <el-tab-pane label="我的信息" name="first" />
               <el-tab-pane label="修改密码" name="second" />
-              <el-tab-pane label="修改资料" name="third" />
-              <el-tab-pane label="设置头像" name="forth" />
+              <el-tab-pane label="设置头像" name="third" />
             </el-tabs>
             <router-view v-slot="{ Component }">
               <transition name="el-fade-in-linear" mode="out-in">
