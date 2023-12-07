@@ -59,7 +59,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     public Account findByNameOrEmail(String text) {
         return this.query()
-                .eq("username", text).or()
+                .eq("binary username", text).or()
                 .eq("email", text)
                 .one();
     }
@@ -126,12 +126,30 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public String  updateAvatar(MultipartFile file) {
+    public String updateAvatar(MultipartFile file) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null){
+            throw new RuntimeException("登录状态已过期");
+        }
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            Account account = findByNameOrEmail(userDetails.getUsername());
+            UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(),file);
+            account.setAvatar(uploadFile.getType() + "/" + uploadFile.getFileName());
+            boolean update = this.update().eq("email",account.getEmail()).set("avatar", account.getAvatar()).update();
+            if(update)
+                return null;
+            else
+                return "内部错误，请联系管理员";
+        }
+        throw new RuntimeException("找不到当前登录信息");
+    }
+
+    @Override
+    public String updateUsername(String username) {
         Account account = getCurrentLoginUser();
-        UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(),file);
-        account.setAvatar(uploadFile.getType() + "/" + uploadFile.getFileName());
-        boolean update = this.update().eq("email",account.getEmail()).set("avatar", account.getAvatar()).update();
-        if(update)
+        boolean update = this.update().eq("email", account.getEmail()).set("username",username).update();
+        if (update)
             return null;
         else
             return "内部错误，请联系管理员";

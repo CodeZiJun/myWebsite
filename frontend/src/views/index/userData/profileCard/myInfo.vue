@@ -2,11 +2,27 @@
 import {InfoFilled, User} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {getStorageInfoJson} from "@/utils/profileUtils";
-let myInfo = ref(getStorageInfoJson())
+import {accountInfoItemName, post} from "@/net";
+import {ElMessage} from "element-plus";
+import {myInfo} from "@/utils/profileUtils";
 let editing = ref(false)
+const inputName = ref("")
 
-function modifyUsername() {
-
+function doModify(username) {
+  let formData = new FormData();
+  formData.append("username", username)
+  post("/api/account/updateUsername", formData,
+      (data) => {
+        let info = getStorageInfoJson();
+        info.username = data.username
+        localStorage.getItem(accountInfoItemName) ? localStorage.setItem(accountInfoItemName, JSON.stringify(info)) :
+                                                    sessionStorage.setItem(accountInfoItemName, JSON.stringify(info))
+        editing.value = !editing.value
+        myInfo.value = getStorageInfoJson()
+        ElMessage.success("修改成功！")
+      },
+      (data) => ElMessage.error(data.message)
+  )
 }
 </script>
 
@@ -17,7 +33,7 @@ function modifyUsername() {
         <div class="card-header">
           <el-icon size="25px"><InfoFilled /></el-icon>
           <div>
-            <el-button v-show="editing" plain type="primary" class="button">确认修改</el-button>
+            <el-button v-show="editing" plain type="primary" class="button" @click=doModify(inputName)>确认修改</el-button>
             <el-button v-show="editing" class="button"  type="warning" text @click="() => editing = !editing">取消修改</el-button>
             <el-button v-show="!editing" class="button" plain type="warning" text @click="() => editing = !editing">修改信息</el-button>
           </div>
@@ -26,7 +42,7 @@ function modifyUsername() {
       <div class="card-body">
         <div class="card-body-username">
           <h2 v-show="!editing">{{ myInfo.username }}</h2>
-          <el-input v-show="editing" :placeholder="myInfo.username" maxlength="20" show-word-limit clearable size="large">
+          <el-input v-show="editing" :placeholder="myInfo.username" v-model="inputName" maxlength="20" show-word-limit clearable size="large">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>

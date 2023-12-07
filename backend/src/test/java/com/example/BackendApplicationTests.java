@@ -1,23 +1,24 @@
 package com.example;
 
-import com.deepoove.poi.XWPFTemplate;
+import com.example.entity.dto.Account;
+import com.example.service.AccountService;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import com.example.utils.docxUtils;
-import org.springframework.util.ResourceUtils;
 
 @SpringBootTest
 class BackendApplicationTests {
-
+    @Resource
+    AccountService service;
     @Test
     void contextLoads() {
+        Account account =service.query()
+                .eq("binary username", "CodeZijun")
+                .one();
+        System.out.println(account);
     }
 
     @Test

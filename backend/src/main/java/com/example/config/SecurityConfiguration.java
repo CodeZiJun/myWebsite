@@ -7,7 +7,6 @@ import com.example.filter.JwtAuthorizeFilter;
 import com.example.service.AccountService;
 import com.example.utils.JwtUtils;
 import jakarta.annotation.Resource;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -71,7 +70,7 @@ public class SecurityConfiguration {
         //获取用户详细信息 Security的User
         User user = (User) authentication.getPrincipal();
         Account account = service.findByNameOrEmail(user.getUsername());
-        String token = jwtUtils.createJwt(user, account.getId(), account.getUsername());
+        String token = jwtUtils.createJwt(user, account.getId(), account.getEmail());
         AuthorizeVO vo = new AuthorizeVO();
         vo.setExpire(jwtUtils.expireTime());
         vo.setRole(account.getRole());

@@ -1,7 +1,7 @@
 <script setup>
 import {accountInfoItemName, logout} from "@/net";
 import router from "@/router";
-import {avatarRef} from '@/utils/profileUtils'
+import {avatarRef, myInfo} from '@/utils/profileUtils'
 import {
   ArrowRight,
   Avatar, CreditCard,
@@ -26,7 +26,7 @@ let routeNames = ref()
 let isCollapse = ref(false);
 let asideWidth = ref('200px');
 
-const accountInfo = JSON.parse(
+const accountName = JSON.parse(
     (sessionStorage.getItem(accountInfoItemName) ? sessionStorage.getItem(accountInfoItemName)
         : localStorage.getItem(accountInfoItemName))).username
 //获取面包屑数据
@@ -180,7 +180,7 @@ router.afterEach((to, from) => {
             <div style="display: flex; align-items: center; cursor: default">
               <img :src=avatarRef
                    alt="" style="width: 40px; height: 40px; border-radius: 50%; margin: 0 5px" />
-              <span>{{ accountInfo }}</span>
+              <span>{{ myInfo.username }}</span>
             </div>
             <template #dropdown>
               <el-dropdown-menu slot="dropdown" style="user-select: none">

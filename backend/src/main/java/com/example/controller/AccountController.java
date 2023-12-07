@@ -18,15 +18,27 @@ public class AccountController {
     @Resource
     AccountServiceImpl accountService;
 
-    public record Vo(String avatar){}
+    public record voAvatar(String avatar){}
+    public record voUsername(String username){}
     @PostMapping(value = "/updateAvatar")
     public String updateAvatar(@RequestParam MultipartFile avatar) {
         if(accountService.updateAvatar(avatar) == null){
             Account currentLoginUser = accountService.getCurrentLoginUser();
-            Vo vo = new Vo(currentLoginUser.getAvatar());
+            voAvatar vo = new voAvatar(currentLoginUser.getAvatar());
             return RestBean.success(vo).toJsonString();
         }
         else
             return RestBean.failure(400,"服务器内部错误").toJsonString();
+    }
+
+    @PostMapping(value = "/updateUsername")
+    public String updateUsername(@RequestParam String username) {
+        if(accountService.updateUsername(username) == null) {
+            Account currentLoginUser = accountService.getCurrentLoginUser();
+            voUsername vo = new voUsername(currentLoginUser.getUsername());
+            return RestBean.success(vo).toJsonString();
+        }
+        else
+            return RestBean.failure(400, "服务器内部错误").toJsonString();
     }
 }

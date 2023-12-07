@@ -62,13 +62,13 @@ public class JwtUtils {
         return Boolean.TRUE.equals(template.hasKey(Const.JWT_BLACK_LIST + uuid));
     }
 
-    public String createJwt(UserDetails details, int id, String username) {
+    public String createJwt(UserDetails details, int id, String email) {
         Algorithm algorithm = Algorithm.HMAC256(key);
         Date expire = this.expireTime();
         return JWT.create()
                 .withJWTId(UUID.randomUUID().toString())
                 .withClaim("id", id)
-                .withClaim("name", username)
+                .withClaim("email", email)
                 //将用户的权限列表作为声明添加到JWT中。这里使用`details.getAuthorities()`获取用户的权限信息，然后将权限名称提取出来并转换为列表。
                 .withClaim("authorities", details.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 //过期时间
@@ -117,7 +117,7 @@ public class JwtUtils {
     public UserDetails toUser(DecodedJWT jwt) {
         Map<String, Claim> claims = jwt.getClaims();
         return User
-                .withUsername(claims.get("name").asString())
+                .withUsername(claims.get("email").asString())
                 .password("*****")
                 .authorities(claims.get("authorities").asArray(String.class))
                 .build();
