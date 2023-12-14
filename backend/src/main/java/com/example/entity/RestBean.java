@@ -12,6 +12,8 @@ public record RestBean<T>(int code, T data, String message) {
         return new RestBean<>(200,null, message);
     }
 
+
+    public static RestBean successDict(Object data) {return new RestBean(200,data,"请求成功"); }
     public static <T> RestBean<T> success() {
         return success(null);
     }

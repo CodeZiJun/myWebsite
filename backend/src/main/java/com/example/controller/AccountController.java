@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,6 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.management.Query;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -51,5 +57,27 @@ public class AccountController {
         Page<Account> page = new Page<>(pageNum, pageSize);
         IPage<Account> iPage = accountService.selectAccountPage(page);
         return RestBean.success(iPage).toJsonString();
+    }
+
+
+    @GetMapping("/charts")
+    public RestBean charts() {
+
+        List<Account> accountList=accountService.list();
+        Set<String> roles=accountList.stream().map(Account::getRole).collect(Collectors.toSet());
+        List<String> roleList= CollUtil.newArrayList(roles);
+        List<Dict> linelist =new ArrayList<>();
+        for(String role:roleList){
+            Integer value=0;
+            for(Account u : accountList){
+                if(u.getRole().equals(role)){ value+=1;};
+            }
+            Dict dict=Dict.create();
+            Dict line=dict.set("role",role).set("value",value);
+            linelist.add(line);
+        }
+        Dict res = Dict.create().set("line", linelist);
+        System.out.println(res);
+        return RestBean.successDict(res);
     }
 }
