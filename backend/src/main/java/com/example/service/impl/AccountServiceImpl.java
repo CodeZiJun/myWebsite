@@ -1,6 +1,8 @@
 package com.example.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.UploadFile;
@@ -38,6 +40,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     UploadFileUtils uploadFileUtils;
     @Resource
     AmqpTemplate amqpTemplate;
+
+    @Resource
+    AccountMapper accountMapper;
 
     @Resource
     StringRedisTemplate stringRedisTemplate;
@@ -153,6 +158,11 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return null;
         else
             return "内部错误，请联系管理员";
+    }
+
+    @Override
+    public IPage<Account> selectAccountPage(Page<Account> page) {
+        return accountMapper.selectPage(page, null);
     }
 
     private boolean verifyLimit(String ip) {

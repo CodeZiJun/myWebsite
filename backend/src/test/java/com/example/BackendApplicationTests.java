@@ -23,7 +23,7 @@ class BackendApplicationTests {
 
     @Test
     void encodePasswordUtil() {
-        System.out.println(new BCryptPasswordEncoder().encode("123456"));
+        System.out.println(new BCryptPasswordEncoder().encode("codezijun"));
     }
 
     @Test
