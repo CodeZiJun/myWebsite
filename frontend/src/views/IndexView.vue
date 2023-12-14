@@ -13,7 +13,7 @@ import {
   MessageBox, Money, Printer,
   Tickets
 } from "@element-plus/icons-vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRoute} from "vue-router";
 import {getDescriptions, getNames} from "@/utils/routeUtils";
 import {ref} from "vue";
 import screenfull from "screenfull";
@@ -195,7 +195,9 @@ router.afterEach((to, from) => {
       <el-main>
         <router-view v-slot="{ Component }">
           <transition name="el-fade-in-linear" mode="out-in">
-            <component :is="Component"/>
+            <div :key="$route.path">
+              <component :is="Component" />
+            </div>
           </transition>
         </router-view>
       </el-main>

@@ -1,12 +1,15 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
-import {get} from "@/net";
+import {getWithData} from "@/net";
 import {ElMessage} from "element-plus";
 
 let searchText = ref("")
 const currentPage = ref(1)
 const pageSize = ref(5)
 const totalPage = ref(20)
+let details = new reactive({
+  detail: null
+})
 let orderlist = new reactive({
   current: 1,
   total: null,
@@ -21,13 +24,16 @@ const handleCurrentChange = (val) => {
   orderlist.current = val
   getdata()
 }
-
+const handleInputChange = () => {
+  details.detail = searchText
+  getdata()
+}
 const getdata = () => {
-  get(`/api/account/selectAccountPage/${orderlist.current}/${orderlist.size}`,
-      (data) => {
+  getWithData(`/api/account/selectAccountPage/${orderlist.current}/${orderlist.size}`,
+      details
+      ,(data) => {
         totalPage.value = data.total
         orderlist.data = data.records
-        console.log(data)
       }, () => {
           ElMessage.error("数据请求失败！")
       })
@@ -39,7 +45,7 @@ onMounted(() => getdata())
 <template>
   <div>
     <div>
-      <el-input style="width: 200px" placeholder="查询名称" v-model="searchText"></el-input>
+      <el-input style="width: 200px" placeholder="查询名称" v-model="searchText" @input="handleInputChange"></el-input>
       <el-button type="primary" style="margin-left: 10px">查询</el-button>
       <el-button type="info">重置</el-button>
     </div>
@@ -49,7 +55,7 @@ onMounted(() => getdata())
       <el-button type="danger" plain>批量删除</el-button>
     </div>
 
-    <el-table :data="orderlist.data">
+    <el-table :data="orderlist.data" border>
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column prop="id" label="序号" width="70" align="center"></el-table-column>
       <el-table-column prop="username" label="用户名" align="center"></el-table-column>

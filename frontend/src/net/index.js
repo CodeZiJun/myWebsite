@@ -78,7 +78,7 @@ function internalPost(url, data, header, success, failure, error = defaultError)
 
 //内部的Get Axios封装
 function internalGet(url, header, success, failure, error = defaultError) {
-    axios.get(url, {headers: header}).then(({data}) => {
+    axios.get(url,{headers: header}).then(({data}) => {
         if (data.code === 200) {
             success(data.data)
         } else {
@@ -90,6 +90,16 @@ function internalGet(url, header, success, failure, error = defaultError) {
 //已近封装了请求头内加入了Token，可以直接用
 function get(url, success, failure = defaultFailure) {
     internalGet(url, accessHeader(), success, failure)
+}
+
+function getWithData(url, data, success, failure = defaultFailure) {
+    axios.get(url, {params: data, headers: accessHeader()}).then(({data}) => {
+        if (data.code === 200) {
+            success(data.data)
+        } else {
+            failure(data.message, data.code, url)
+        }
+    }).catch(err => error(err))
 }
 
 function post(url, data, success, failure = defaultFailure) {
@@ -124,4 +134,4 @@ function unauthorized() {
     return !takeAccessToken()
 }
 
-export {login, logout, get, post, unauthorized, accountInfoItemName}
+export {login, logout, get, post, unauthorized, accountInfoItemName, getWithData}

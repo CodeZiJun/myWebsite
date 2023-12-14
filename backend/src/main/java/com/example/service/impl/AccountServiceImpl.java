@@ -1,5 +1,7 @@
 package com.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -161,8 +163,19 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public IPage<Account> selectAccountPage(Page<Account> page) {
-        return accountMapper.selectPage(page, null);
+    public IPage<Account> selectAccountPage(Page<Account> page, Wrapper<Account> wrapper) {
+        return accountMapper.selectPage(page, wrapper);
+    }
+
+    @Override
+    public IPage<Account> selectAccountByDetailPage(Page<Account> page, String detail) {
+        QueryWrapper<Account> wrapper = new QueryWrapper<>();
+        if (!"".equals(detail)) {
+            wrapper.like("username", detail).or()
+                    .like("email", detail).or()
+                    .eq("role", detail);
+        }
+        return selectAccountPage(page, wrapper);
     }
 
     private boolean verifyLimit(String ip) {
