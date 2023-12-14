@@ -1,12 +1,18 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
-import {getWithData} from "@/net";
+import {del, getWithData} from "@/net";
 import {ElMessage} from "element-plus";
 
 let searchText = ref("")
 const currentPage = ref(1)
 const pageSize = ref(5)
 const totalPage = ref(20)
+const deleteDialogVisible = ref(false)
+const deleleAccount = reactive({
+  username: "",
+  id: null,
+  role: ""
+})
 let details = new reactive({
   detail: null
 })
@@ -39,6 +45,25 @@ const getdata = () => {
       })
 }
 
+const confirmDeleteOne = (username, id, role) => {
+  deleleAccount.id = id
+  deleleAccount.username = username
+  deleleAccount.role = role
+  deleteDialogVisible.value = true
+}
+
+const deleteOne = (id) => {
+  del(`/api/account/delete/${id}`,
+      () => {
+        ElMessage.success("删除成功")
+      }, () => {
+        ElMessage.error("删除失败")
+      }
+  )
+  deleteDialogVisible.value = false
+  getdata()
+}
+
 onMounted(() => getdata())
 </script>
 
@@ -47,7 +72,7 @@ onMounted(() => getdata())
     <div>
       <el-input style="width: 200px" placeholder="查询名称" v-model="searchText" @input="handleInputChange"></el-input>
       <el-button type="primary" style="margin-left: 10px">查询</el-button>
-      <el-button type="info">重置</el-button>
+      <el-button type="info" @click="() => {searchText = '';getdata()}">重置</el-button>
     </div>
 
     <div style="margin: 10px 0">
@@ -65,7 +90,7 @@ onMounted(() => getdata())
       <el-table-column label="操作" align="center" width="180">
         <template v-slot="scope">
           <el-button size="small" type="primary" plain >编辑</el-button>
-          <el-button size="small" type="danger" plain >删除</el-button>
+          <el-button size="small" type="danger" plain @click="confirmDeleteOne(scope.row.username, scope.row.id, scope.row.role)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -80,12 +105,37 @@ onMounted(() => getdata())
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         >
-
       </el-pagination>
     </div>
+    <el-dialog
+      v-model="deleteDialogVisible"
+      title="删除警告"
+      width="30%"
+      align-center
+      style="border-radius: 20px"
+    >
+      <span style="font-size: 16px">
+        您将要删除用户的信息，请确认！
+        <br>
+        <strong>ID:{{ deleleAccount.id }}</strong>
+        <br>
+        <strong>用户名: {{ deleleAccount.username }}</strong>
+        <br>
+        <strong>身份: {{ deleleAccount.role }}</strong>
+      </span>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="warning" @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="deleteOne(deleleAccount.id)">确定</el-button>
+        </span>
+
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <style scoped>
-
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
 </style>

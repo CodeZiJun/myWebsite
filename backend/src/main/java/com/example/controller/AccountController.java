@@ -54,4 +54,12 @@ public class AccountController {
         }
         return RestBean.success(iPage).toJsonString();
     }
+
+    @DeleteMapping(value = "/delete/{id}")
+    public String deleteAccountById(@PathVariable("id") Integer id) {
+        if (accountService.removeById(id))
+            return RestBean.success().toJsonString();
+        else
+            return RestBean.failure(400, "删除失败").toJsonString();
+    }
 }
