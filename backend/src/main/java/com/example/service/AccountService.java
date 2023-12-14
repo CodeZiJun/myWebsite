@@ -1,5 +1,7 @@
 package com.example.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.entity.dto.Account;
 import com.example.entity.vo.request.ConfirmResetVO;
@@ -16,4 +18,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     String resetEmailAccountPassword(EmailResetVO vo);
     String updateAvatar(MultipartFile file);
     String updateUsername(String username);
+    IPage<Account> selectAccountPage(Page<Account> page);
 }
