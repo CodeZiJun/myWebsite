@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.entity.dto.Account;
+import com.example.entity.vo.request.AccountAddVO;
 import com.example.entity.vo.request.ConfirmResetVO;
 import com.example.entity.vo.request.EmailRegisterVO;
 import com.example.entity.vo.request.EmailResetVO;
@@ -21,4 +22,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     String updateUsername(String username);
     IPage<Account> selectAccountPage(Page<Account> page, Wrapper<Account> wrapper);
     IPage<Account> selectAccountByDetailPage(Page<Account> page, String detail);
+    String addAccount(AccountAddVO vo);
 }

@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
+import com.example.entity.vo.request.AccountAddVO;
 import com.example.service.impl.AccountServiceImpl;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,10 +68,16 @@ public class AccountController {
     }
 
     @DeleteMapping(value = "/deleteBatch")
-    public String deleAccountBatchByids(@RequestBody(required = true) List<Integer> ids) {
+    public String deleAccountBatchByids(@RequestBody() List<Integer> ids) {
         if (accountService.removeBatchByIds(ids))
             return RestBean.success().toJsonString();
         else
             return RestBean.failure(400, "删除失败").toJsonString();
+    }
+
+    @PostMapping(value = "/addAccount")
+    public String addAccount(@RequestBody @Valid AccountAddVO vo) {
+        String message = accountService.addAccount(vo);
+        return message == null ? RestBean.success().toJsonString() : RestBean.failure(400, message).toJsonString();
     }
 }

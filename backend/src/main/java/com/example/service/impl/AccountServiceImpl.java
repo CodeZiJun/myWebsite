@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.UploadFile;
+import com.example.entity.vo.request.AccountAddVO;
 import com.example.entity.vo.request.ConfirmResetVO;
 import com.example.entity.vo.request.EmailRegisterVO;
 import com.example.entity.vo.request.EmailResetVO;
@@ -108,6 +109,19 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         } else {
             return "内部错误，请联系管理员";
         }
+    }
+
+    @Override
+    public String addAccount(AccountAddVO vo) {
+        String email = vo.getEmail();
+        String username = vo.getUsername();
+        String role = vo.getRole();
+        String password = encoder.encode(vo.getUsername());
+        Account account = new Account(null, username, password, email, role, new Date(), null);
+        if (this.save(account))
+            return null;
+        else
+            return "内部错误，请联系管理员";
     }
 
     @Override
