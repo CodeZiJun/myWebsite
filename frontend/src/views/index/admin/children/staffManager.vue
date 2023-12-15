@@ -1,11 +1,13 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
 import {del, delWithData, getWithData, post} from "@/net";
-import {ElMessage} from "element-plus";
-import {Message, User, Warning} from "@element-plus/icons-vue";
+import {ElMessage, ElNotification} from "element-plus";
+import {Delete, Edit, Message, Upload, User, Warning} from "@element-plus/icons-vue";
 import {myInfo} from "@/utils/profileUtils";
 
 let searchText = ref("")
+let flagOpenTip = 0
+let flagCloseTip = 0
 const addFormRef = ref()
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -13,6 +15,18 @@ const totalPage = ref(20)
 const deleteDialogVisible = ref(false)
 const addDialogVisible = ref(false)
 const multipleSelection = ref([])
+const getUpdateAccountVos = () => {
+  const vos = []
+  for (let i = 0; i < accountList.data.length; i ++){
+    vos.push({
+      username: accountList.data[i].username,
+      email: accountList.data[i].email,
+      role: accountList.data[i].role,
+      id: accountList.data[i].id
+    })
+  }
+  return vos;
+}
 const validateUsername = (rule, value, callback) => {
   if(value === ''){
     callback(new Error('请输入用户名'))
@@ -85,15 +99,29 @@ const submitAddForm = () => {
     }
   })
 }
-
 const getdata = () => {
   getWithData(`/api/account/selectAccountPage/${accountList.current}/${accountList.size}`,
       details
       ,(data) => {
         totalPage.value = data.total
         accountList.data = data.records
+        for(let i = 0; i < accountList.data.length; i ++) {
+          accountList.data[i].status = false
+        }
       }, () => {
           ElMessage.error("数据请求失败！")
+      })
+}
+
+const submitAllModified = () => {
+  post("/api/account/updateAccountBatch",
+      getUpdateAccountVos(),
+      () => {
+        getdata()
+        ElMessage.success("更新成功")
+      }, () => {
+        ElMessage.error("更新失败")
+        getdata()
       })
 }
 
@@ -135,8 +163,39 @@ const canSelect = (row, index) => {
   else
     return row.email !== myInfo.value.email;
 }
-
-onMounted(() => getdata())
+const editOpen = (row) => {
+  if (!flagOpenTip) {
+    openEditTip()
+    flagOpenTip ++
+  }
+  row.status = true
+}
+const editClose = (currentRow, oldCurrentRow) => {
+  if(oldCurrentRow!==null){
+    oldCurrentRow.status=false
+    if (!flagCloseTip) {
+      closeEditTip()
+      flagCloseTip ++
+    }
+  }
+}
+const openEditTip = () => {
+  ElNotification({
+    title: '编辑Tip',
+    message: '双击或单击编辑按钮开始编辑，选中其他行结束',
+    type: 'success',
+  })
+}
+const closeEditTip = () => {
+  ElNotification({
+    title: '保存Tip',
+    message: '每次切换页面或翻页表格前记得提交修改哦',
+    type: 'warning',
+  })
+}
+onMounted(() => {
+  getdata()
+})
 </script>
 
 <template>
@@ -148,7 +207,7 @@ onMounted(() => getdata())
     </div>
 
     <div style="margin: 10px 0">
-      <el-button type="primary" @click="evt => {addDialogVisible = true}" plain>新增</el-button>
+      <el-button type="primary" @click="evt => {addDialogVisible = true}" plain :icon="Upload">新增账户</el-button>
       <el-popconfirm
         width="220"
         confirm-button-text="确认"
@@ -159,25 +218,47 @@ onMounted(() => getdata())
         title="你确定要执行批量删除？"
       >
         <template #reference>
-          <el-button type="danger" plain>批量删除</el-button>
+          <el-button type="danger" plain :icon="Delete">批量删除</el-button>
         </template>
       </el-popconfirm>
+      <el-button type="success" plain :icon="Edit" @click="submitAllModified">提交修改</el-button>
     </div>
 
     <el-table :data="accountList.data"
               :header-cell-style="{ backgroundColor: 'aliceblue', color: '#666' }"
               @selection-change="handleSelectionChange"
+              @cell-dblclick="editOpen"
+              @current-change="editClose"
+              highlight-current-row
               border>
       <el-table-column type="selection" width="55" align="center" :selectable="canSelect"></el-table-column>
       <el-table-column prop="id" label="序号" width="70" align="center"></el-table-column>
-      <el-table-column prop="username" label="用户名" align="center"></el-table-column>
-      <el-table-column prop="email" label="邮箱" align="center"></el-table-column>
-      <el-table-column prop="role" label="角色" align="center"></el-table-column>
+      <el-table-column prop="username" label="用户名" align="center">
+        <template #default="{row}">
+          <el-input v-if="row.status" v-model="row.username"></el-input>
+          <span v-else>{{ row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="email" label="邮箱" align="center">
+        <template #default="{row}">
+          <el-input v-if="row.status" v-model="row.email"></el-input>
+          <span v-else>{{ row.email }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="role" label="角色" align="center">
+        <template #default="{row}">
+          <el-radio-group v-if="row.status" v-model="row.role">
+            <el-radio label="user"  />
+            <el-radio label="admin" />
+          </el-radio-group>
+          <span v-else>{{ row.role }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="registerTime" label="注册时间" align="center"></el-table-column>
       <el-table-column label="操作" align="center" width="180">
-        <template v-slot="scope">
-          <el-button size="small" type="primary" plain >编辑</el-button>
-          <el-button size="small" type="danger" plain @click="confirmDeleteOne(scope.row.username, scope.row.id, scope.row.role)">删除</el-button>
+        <template v-slot="scope" #default="{row}">
+          <el-button size="small" type="primary" plain @click="editOpen(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" plain :disabled="scope.row.status" @click="confirmDeleteOne(scope.row.username, scope.row.id, scope.row.role)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

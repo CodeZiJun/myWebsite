@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @TableName("db_account")
+@NoArgsConstructor
 @AllArgsConstructor
 public class Account {
     @TableId(type = IdType.AUTO)

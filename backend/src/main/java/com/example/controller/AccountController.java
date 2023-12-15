@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.vo.request.AccountAddVO;
+import com.example.entity.vo.request.AccountUpdateVO;
 import com.example.service.impl.AccountServiceImpl;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -68,7 +70,7 @@ public class AccountController {
     }
 
     @DeleteMapping(value = "/deleteBatch")
-    public String deleAccountBatchByids(@RequestBody() List<Integer> ids) {
+    public String deleAccountBatchByids(@RequestBody List<Integer> ids) {
         if (accountService.removeBatchByIds(ids))
             return RestBean.success().toJsonString();
         else
@@ -80,4 +82,29 @@ public class AccountController {
         String message = accountService.addAccount(vo);
         return message == null ? RestBean.success().toJsonString() : RestBean.failure(400, message).toJsonString();
     }
+
+    @PostMapping(value = "/updateAccountBatch")
+    public String updateAccountBatch(@RequestBody List<AccountUpdateVO> vos) {
+        String message;
+        List<Account> accounts = new ArrayList<>();
+        for(AccountUpdateVO vo : vos) {
+            Account account = new Account();
+            account.setRole(vo.getRole());
+            account.setEmail(vo.getEmail());
+            account.setUsername(vo.getUsername());
+            account.setId(vo.getId());
+            accounts.add(account);
+        }
+        try{
+            if(accountService.updateBatchById(accounts))
+                message = null;
+            else
+                message = "内部错误，请联系管理员";
+        } catch (Exception e) {
+            message = "无法更改";
+        }
+
+        return message == null ? RestBean.success().toJsonString() : RestBean.failure(400, message).toJsonString();
+    }
+
 }
