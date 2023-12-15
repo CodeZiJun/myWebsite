@@ -140,7 +140,7 @@ function login(username, password, remember, success, failure = defaultFailure) 
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
         storeAccessToken(data.token, remember, data.expire)
-        storeAccountInfo(data.avatar, data.email, data.registerDate, data.username)
+        storeAccountInfo(data.avatar, data.email, data.registerDate, data.username, remember)
         ElMessage.success(`登录成功，欢迎${username}`)
         success(data)
     }, failure)
