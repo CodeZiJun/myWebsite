@@ -10,6 +10,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Validated
 @RestController
 @RequestMapping("/api/account")
@@ -58,6 +60,14 @@ public class AccountController {
     @DeleteMapping(value = "/delete/{id}")
     public String deleteAccountById(@PathVariable("id") Integer id) {
         if (accountService.removeById(id))
+            return RestBean.success().toJsonString();
+        else
+            return RestBean.failure(400, "删除失败").toJsonString();
+    }
+
+    @DeleteMapping(value = "/deleteBatch")
+    public String deleAccountBatchByids(@RequestBody(required = true) List<Integer> ids) {
+        if (accountService.removeBatchByIds(ids))
             return RestBean.success().toJsonString();
         else
             return RestBean.failure(400, "删除失败").toJsonString();

@@ -102,11 +102,7 @@ function get(url, success, failure = defaultFailure) {
     internalGet(url, accessHeader(), success, failure)
 }
 
-function del(url, success, failure = defaultFailure) {
-    internalDelete(url, accessHeader(), success, failure)
-}
-
-function getWithData(url, data, success, failure = defaultFailure) {
+function getWithData(url, data, success, failure = defaultFailure, error = defaultError) {
     axios.get(url, {params: data, headers: accessHeader()}).then(({data}) => {
         if (data.code === 200) {
             success(data.data)
@@ -115,6 +111,21 @@ function getWithData(url, data, success, failure = defaultFailure) {
         }
     }).catch(err => error(err))
 }
+
+function del(url, success, failure = defaultFailure) {
+    internalDelete(url, accessHeader(), success, failure)
+}
+
+function delWithData(url, data, success, failure = defaultFailure, error = defaultError) {
+    axios.delete(url, {data: data, headers: accessHeader()}).then(({data}) => {
+        if(data.code === 200) {
+            success(data.data)
+        } else {
+            failure(data.message, data.code, url)
+        }
+    }).catch(err => error(err))
+}
+
 
 function post(url, data, success, failure = defaultFailure) {
     internalPost(url, data, accessHeader() ,success, failure);
@@ -148,4 +159,4 @@ function unauthorized() {
     return !takeAccessToken()
 }
 
-export {login, logout, get, post, unauthorized, accountInfoItemName, getWithData, del}
+export {login, logout, get, post, unauthorized, accountInfoItemName, getWithData, del, delWithData}
