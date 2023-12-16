@@ -23,4 +23,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     IPage<Account> selectAccountPage(Page<Account> page, Wrapper<Account> wrapper);
     IPage<Account> selectAccountByDetailPage(Page<Account> page, String detail);
     String addAccount(AccountAddVO vo);
+    Account selectOneByEmail(String email);
 }

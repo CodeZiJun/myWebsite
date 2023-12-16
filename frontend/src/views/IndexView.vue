@@ -150,7 +150,7 @@ onMounted(
             <el-menu-item index="/admin/staff">
               <template #title>
                 <el-icon><Avatar /></el-icon>
-                <span>职工管理</span>
+                <span>账户管理</span>
               </template>
             </el-menu-item>
             <el-menu-item index="/admin/department">

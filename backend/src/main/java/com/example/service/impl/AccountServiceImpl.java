@@ -122,6 +122,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return "内部错误，请联系管理员";
     }
 
+    @Override
+    public Account selectOneByEmail(String email) {
+        QueryWrapper<Account> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        return accountMapper.selectOne(wrapper);
+    }
+
 
     @Override
     public String resetConfirm(ConfirmResetVO vo) {

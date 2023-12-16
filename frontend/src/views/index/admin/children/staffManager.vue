@@ -193,6 +193,10 @@ const closeEditTip = () => {
     type: 'warning',
   })
 }
+const filterRole = (value, row) => {
+  return row.role === value
+}
+
 onMounted(() => {
   getdata()
 })
@@ -245,13 +249,25 @@ onMounted(() => {
           <span v-else>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="role" label="角色" align="center">
+      <el-table-column prop="role"
+                       label="角色"
+                       align="center"
+                       :filters="[
+                           {text: 'admin', value: 'admin'},
+                           {text: 'user', value: 'user'}
+                       ]"
+                       filter-placement="bottom-end"
+                       :filter-method="filterRole">
         <template #default="{row}">
           <el-radio-group v-if="row.status" v-model="row.role">
             <el-radio label="user"  />
             <el-radio label="admin" />
           </el-radio-group>
-          <span v-else>{{ row.role }}</span>
+          <el-tag
+              v-else
+              :type="row.role === 'admin' ? 'warning' : 'success'"
+              disable-transitions
+          >{{ row.role }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="registerTime" label="注册时间" align="center"></el-table-column>
