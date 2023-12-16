@@ -45,12 +45,13 @@ function storeAccessToken(token, remember, expire) {
         sessionStorage.setItem(authItemName, str)
 }
 
-function storeAccountInfo(avatar, email, registerDate, username, remember) {
+function storeAccountInfo(avatar, email, registerDate, username, role, remember) {
     const accountObj = {
         avatar: avatar,
         email: email,
         registerDate: registerDate,
-        username: username
+        username: username,
+        role: role
     }
     const str = JSON.stringify(accountObj)
     if(remember)
@@ -76,9 +77,19 @@ function internalPost(url, data, header, success, failure, error = defaultError)
     }).catch(err => error(err))
 }
 
+function internalDelete(url, header, success, failure, error = defaultError) {
+    axios.delete(url, {headers: header}).then(({data})=> {
+        if(data.code === 200) {
+            success(data.data)
+        } else {
+            failure(data.message, data.code, url)
+        }
+    }).catch(err => error(err))
+}
+
 //内部的Get Axios封装
 function internalGet(url, header, success, failure, error = defaultError) {
-    axios.get(url, {headers: header}).then(({data}) => {
+    axios.get(url,{headers: header}).then(({data}) => {
         if (data.code === 200) {
             success(data.data)
         } else {
@@ -91,6 +102,31 @@ function internalGet(url, header, success, failure, error = defaultError) {
 function get(url, success, failure = defaultFailure) {
     internalGet(url, accessHeader(), success, failure)
 }
+
+function getWithData(url, data, success, failure = defaultFailure, error = defaultError) {
+    axios.get(url, {params: data, headers: accessHeader()}).then(({data}) => {
+        if (data.code === 200) {
+            success(data.data)
+        } else {
+            failure(data.message, data.code, url)
+        }
+    }).catch(err => error(err))
+}
+
+function del(url, success, failure = defaultFailure) {
+    internalDelete(url, accessHeader(), success, failure)
+}
+
+function delWithData(url, data, success, failure = defaultFailure, error = defaultError) {
+    axios.delete(url, {data: data, headers: accessHeader()}).then(({data}) => {
+        if(data.code === 200) {
+            success(data.data)
+        } else {
+            failure(data.message, data.code, url)
+        }
+    }).catch(err => error(err))
+}
+
 
 function post(url, data, success, failure = defaultFailure) {
     internalPost(url, data, accessHeader() ,success, failure);
@@ -105,7 +141,7 @@ function login(username, password, remember, success, failure = defaultFailure) 
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
         storeAccessToken(data.token, remember, data.expire)
-        storeAccountInfo(data.avatar, data.email, data.registerDate, data.username)
+        storeAccountInfo(data.avatar, data.email, data.registerDate, data.username, data.role, remember)
         ElMessage.success(`登录成功，欢迎${username}`)
         success(data)
     }, failure)
@@ -124,4 +160,4 @@ function unauthorized() {
     return !takeAccessToken()
 }
 
-export {login, logout, get, post, unauthorized, accountInfoItemName}
+export {login, logout, get, post, unauthorized, accountInfoItemName, getWithData, del, delWithData}

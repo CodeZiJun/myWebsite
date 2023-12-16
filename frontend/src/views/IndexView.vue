@@ -1,7 +1,7 @@
 <script setup>
 import {accountInfoItemName, logout} from "@/net";
 import router from "@/router";
-import {avatarRef, myInfo} from '@/utils/profileUtils'
+import {avatarRef, getStorageInfoJson, myInfo} from '@/utils/profileUtils'
 import {
   ArrowRight,
   Avatar, CreditCard,
@@ -13,12 +13,10 @@ import {
   MessageBox, Money, Printer,
   Tickets
 } from "@element-plus/icons-vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRoute} from "vue-router";
 import {getDescriptions, getNames} from "@/utils/routeUtils";
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import screenfull from "screenfull";
-import {baseUrl} from "@/main";
-
 
 const route = useRoute()
 let descriptions = ref()
@@ -26,13 +24,15 @@ let routeNames = ref()
 let isCollapse = ref(false);
 let asideWidth = ref('200px');
 
-const accountName = JSON.parse(
-    (sessionStorage.getItem(accountInfoItemName) ? sessionStorage.getItem(accountInfoItemName)
-        : localStorage.getItem(accountInfoItemName))).username
+// const accountName = JSON.parse(
+//     (sessionStorage.getItem(accountInfoItemName) ? sessionStorage.getItem(accountInfoItemName)
+//         : localStorage.getItem(accountInfoItemName))).username
 //获取面包屑数据
 routeNames.value = getNames(route.name, router.getRoutes())
 descriptions.value = getDescriptions(routeNames.value, router.getRoutes())
 function userLogout() {
+  sessionStorage.getItem(accountInfoItemName) ? sessionStorage.removeItem(accountInfoItemName) :
+                                                localStorage.removeItem(accountInfoItemName)
   logout(() => router.push('/'))
 }
 
@@ -46,7 +46,11 @@ router.afterEach((to, from) => {
   routeNames.value = getNames(route.name, router.getRoutes())
   descriptions.value = getDescriptions(routeNames.value, router.getRoutes())
 })
-
+onMounted(
+    () => {
+      myInfo.value = getStorageInfoJson()
+    }
+)
 </script>
 
 <template>
@@ -146,7 +150,7 @@ router.afterEach((to, from) => {
             <el-menu-item index="/admin/staff">
               <template #title>
                 <el-icon><Avatar /></el-icon>
-                <span>职工管理</span>
+                <span>账户管理</span>
               </template>
             </el-menu-item>
             <el-menu-item index="/admin/department">
@@ -180,7 +184,9 @@ router.afterEach((to, from) => {
             <div style="display: flex; align-items: center; cursor: default">
               <img :src=avatarRef
                    alt="" style="width: 40px; height: 40px; border-radius: 50%; margin: 0 5px" />
-              <span>{{ myInfo.username }}</span>
+              <span style="margin-right: 10px">{{ myInfo.username }}</span>
+              <el-tag v-if="myInfo.role === 'admin'" type="warning" effect="dark">{{ myInfo.role }}</el-tag>
+              <el-tag v-else type="success" effect="dark">{{ myInfo.role }}</el-tag>
             </div>
             <template #dropdown>
               <el-dropdown-menu slot="dropdown" style="user-select: none">
@@ -195,7 +201,9 @@ router.afterEach((to, from) => {
       <el-main>
         <router-view v-slot="{ Component }">
           <transition name="el-fade-in-linear" mode="out-in">
-            <component :is="Component"/>
+            <div :key="$route.path">
+              <component :is="Component" />
+            </div>
           </transition>
         </router-view>
       </el-main>

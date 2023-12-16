@@ -7,19 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@TableName("db_account")
+@TableName("db_department")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Department {
     @TableId(type = IdType.AUTO)
     Integer id;
-    String username;
-    String password;
-    String email;
-    String role;
-    Date registerTime;
-    String avatar;
+    String departmentName;
+    Integer ministerId;
 }

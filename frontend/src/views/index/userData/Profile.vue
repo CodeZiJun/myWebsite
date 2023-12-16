@@ -72,7 +72,7 @@ function handleClick(tab) {
   display: flex;
   -webkit-justify-content: center;
   width: 100%;
-  height: 100%;
+  height: 750px;
   background-image: url("https://cdn.pixabay.com/photo/2017/07/01/19/48/background-2462430_1280.jpg")
 }
 .el-row {
