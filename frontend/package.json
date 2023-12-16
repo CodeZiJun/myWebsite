@@ -13,6 +13,7 @@
     "@vue-office/pdf": "^1.5.5",
     "@vueuse/core": "^10.6.1",
     "axios": "^1.6.2",
+    "echarts": "^5.4.3",
     "element-plus": "^2.4.2",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",

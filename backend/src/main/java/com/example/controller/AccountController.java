@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.entity.RestBean;
@@ -15,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -115,4 +119,38 @@ public class AccountController {
         return message == null ? RestBean.success().toJsonString() : RestBean.failure(400, message).toJsonString();
     }
 
+    @GetMapping("/charts")
+    public String charts() {
+        //以下是将所有用户按照角色分类可视化的数据封装
+        List<Account> accountList=accountService.list();
+        Set<String> roles=accountList.stream().map(Account::getRole).collect(Collectors.toSet());
+        List<String> roleList= CollUtil.newArrayList(roles);//角色列表
+        List<Dict> linelist =new ArrayList<>();//折线图
+        for(String role:roleList){
+            Integer value=0;
+            for(Account u : accountList){
+                if(u.getRole().equals(role)){ value+=1;}
+            }
+            Dict dict=Dict.create();
+            Dict line=dict.set("role",role).set("value",value);
+
+            linelist.add(line);
+        }
+        List<Dict> barList = new ArrayList<>();//条形图
+
+        for(String role:roleList){
+            Integer value=0;
+            for(Account u : accountList){
+                if(u.getRole().equals(role)){ value+=1;}
+            }
+            Dict dict=Dict.create();
+            Dict bar=dict.set("role",role).set("value",value);
+
+            barList.add(bar);
+        }
+
+        Dict res = Dict.create().set("line", linelist).set("bar", barList);
+        System.out.println(res);
+        return RestBean.success(res).toJsonString();
+    }
 }
