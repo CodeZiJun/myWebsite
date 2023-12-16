@@ -50,7 +50,7 @@ const option = {
   },
   series: [
     {
-      name: '金额',
+      name: '人数',
       data: [],
       type: 'line',
       smooth: true
@@ -60,7 +60,7 @@ const option = {
 
 const option1 = {
   title: {
-    text: '订单销售的柱状图',
+    text: '用户角色占比柱状图',
     left: 'center'
   },
   tooltip: {
@@ -71,21 +71,21 @@ const option1 = {
   },
   xAxis: {
     type: 'category',
-    data: ['水果', '零食', '饮料', '奶制品', '生活用品']
+    data: []
   },
   yAxis: {
     type: 'value'
   },
   series: [
     {
-      name: '金额',
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
+      name: '角色',
+      data: [],
       type: 'bar',
       smooth: true
     },
     {
-      name: '销量',
-      data: [100, 200, 204, 209, 590, 698, 700],
+      name: '数量',
+      data: [],
       type: 'bar',
       smooth: true
     }
@@ -94,7 +94,7 @@ const option1 = {
 
 const option2 = {
   title: {
-    text: '订单销售统计',
+    text: '角色占比统计',
     subtext: '比例图',
     left: 'center'
   },
@@ -107,17 +107,17 @@ const option2 = {
   },
   series: [
     {
-      name: 'Access From',
+      name: '人数',
       type: 'pie',
       center: ['50%', '60%'],
       radius: '50%',
-      data: [
-        { value: 1048, name: 'Search Engine' },
-        { value: 735, name: 'Direct' },
-        { value: 580, name: 'Email' },
-        { value: 484, name: 'Union Ads' },
-        { value: 300, name: 'Video Ads' }
-      ],
+      data: [],
+      label: {
+        show: true,
+        formatter(param) {
+          return param.name + ' (' + param.percent + '%)';
+        }
+      },
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
@@ -154,10 +154,20 @@ export default {
 
       get(`/api/account/charts`,
           (res) => {
-            option.xAxis.data = res.data?.line?.map(v => v.role) || []
-            option.series[0].data = res.data?.line?.map(v => v.value) || []
-
             console.log(res)
+            option.xAxis.data = res.line.map(v => v.role)
+            option.series[0].data = res.line.map(v => v.value)
+            lineChart.setOption(option)
+
+            option1.xAxis.data = res.line.map(v => v.role)
+            option1.series[1].data = res.line.map(v => v.value)
+            barChart.setOption(option1)
+
+
+
+            option2.series[0].data = res.line
+            pieChart.setOption(option2)
+            console.log(option.xAxis)
           }, () => {
             ElMessage.error("数据请求失败！")
           })

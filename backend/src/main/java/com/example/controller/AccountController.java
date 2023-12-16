@@ -62,11 +62,14 @@ public class AccountController {
 
     @GetMapping("/charts")
     public RestBean charts() {
-
+        //以下是将所有用户按照角色分类可视化的数据封装
         List<Account> accountList=accountService.list();
         Set<String> roles=accountList.stream().map(Account::getRole).collect(Collectors.toSet());
-        List<String> roleList= CollUtil.newArrayList(roles);
-        List<Dict> linelist =new ArrayList<>();
+        List<String> roleList= CollUtil.newArrayList(roles);//角色列表
+
+
+
+        List<Dict> linelist =new ArrayList<>();//折线图
         for(String role:roleList){
             Integer value=0;
             for(Account u : accountList){
@@ -74,9 +77,29 @@ public class AccountController {
             }
             Dict dict=Dict.create();
             Dict line=dict.set("role",role).set("value",value);
+
             linelist.add(line);
         }
-        Dict res = Dict.create().set("line", linelist);
+
+
+        List<Dict> barList = new ArrayList<>();//条形图
+
+        for(String role:roleList){
+            Integer value=0;
+            for(Account u : accountList){
+                if(u.getRole().equals(role)){ value+=1;};
+            }
+            Dict dict=Dict.create();
+            Dict bar=dict.set("role",role).set("value",value);
+
+            barList.add(bar);
+        }
+
+
+
+
+
+        Dict res = Dict.create().set("line", linelist).set("bar", barList);
         System.out.println(res);
         return RestBean.successDict(res);
     }
