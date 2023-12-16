@@ -5,6 +5,12 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
+            path: '/home',
+            name: 'home',
+            component: () => import('@/views/Home.vue'),
+
+        },
+        {
             path: '/',
             name: 'welcome',
             component: () => import('@/views/WelcomeView.vue'),
@@ -201,6 +207,8 @@ router.beforeEach((to, from, next) => {
     if(to.name.startsWith('welcome-') && !isUnauthorized) {
         next('/index')
     } else if (to.fullPath.startsWith('/index') && isUnauthorized){
+        next('/')
+    } else if (to.fullPath.startsWith('/admin') && isUnauthorized) {
         next('/')
     } else {
         next()
