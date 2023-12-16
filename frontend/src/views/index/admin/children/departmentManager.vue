@@ -1,8 +1,9 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
-import {getWithData, post} from "@/net";
+import {del, delWithData, getWithData, post} from "@/net";
 import {ElMessage, ElNotification} from "element-plus";
 import {Delete, Edit, Message, Upload, User, Warning} from "@element-plus/icons-vue";
+import {myInfo} from "@/utils/profileUtils";
 
 let searchText = ref("")
 let flagOpenTip = 0
@@ -18,7 +19,8 @@ const multipleSelection = ref([])
 const deleleDepartment = reactive({
   id: "",
   departmentName: "",
-  username: ""
+  username: "",
+  email: ""
 })
 
 let details = new reactive({
@@ -34,6 +36,31 @@ const addForm = reactive({
   departmentName: '',
   email: ''
 })
+
+const confirmDeleteOne = (id, departmentName, username, email) => {
+  deleleDepartment.id = id
+  deleleDepartment.departmentName = departmentName
+  deleleDepartment.username = username
+  deleleDepartment.email = email
+  deleteDialogVisible.value = true
+}
+const deleteBatch = () => {
+  const ids = multipleSelection.value
+  delWithData('/api/department/deleteBatch',
+      ids,
+      () => {
+        getdata()
+        ElMessage.success("删除成功")
+      }, () => {
+        getdata()
+        ElMessage.error("删除失败")
+      }
+  )
+}
+
+const canSelect = (row, index) => {
+    return row.email !== myInfo.value.email;
+}
 
 const validateDepartmentName = (rule, value, callback) => {
   if(value === ''){
@@ -76,7 +103,16 @@ const submitAddForm = () => {
   })
 }
 const deleteOne = (id) => {
-
+  del(`/api/department/delete/${id}`,
+      () => {
+        getdata()
+        ElMessage.success("删除成功")
+      }, () => {
+        getdata()
+        ElMessage.error("删除失败")
+      }
+  )
+  deleteDialogVisible.value = false
 }
 const handleSizeChange = (val) => {
   departmentList.size = val
@@ -194,6 +230,13 @@ onMounted(() => {
           <span v-else>{{ row.email }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="操作" align="center" width="180">
+        <template v-slot="scope" #default="{row}">
+          <el-button size="small" type="primary" plain @click="editOpen(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" plain :disabled="scope.row.status"
+                     @click="confirmDeleteOne(scope.row.id, scope.row.departmentName, scope.row.username, scope.row.email)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div style="margin: 10px 0">
       <el-pagination
@@ -215,13 +258,15 @@ onMounted(() => {
         style="border-radius: 20px"
     >
       <span style="font-size: 16px">
-        您将要删除用户的信息，请确认！
+        您将要删除部门信息，请确认！
         <br>
-        <strong>ID:{{ deleleDepartment.id }}</strong>
+        <strong>部门ID:{{ deleleDepartment.id }}</strong>
         <br>
-        <strong>用户名: {{ deleleDepartment.departmentName }}</strong>
+        <strong>部门名: {{ deleleDepartment.departmentName }}</strong>
         <br>
-        <strong>身份: {{ deleleDepartment.username }}</strong>
+        <strong>负责人姓名: {{ deleleDepartment.username }}</strong>
+        <br>
+        <strong>负责人邮箱:  {{ deleleDepartment.email }}</strong>
       </span>
       <template #footer>
         <span class="dialog-footer">

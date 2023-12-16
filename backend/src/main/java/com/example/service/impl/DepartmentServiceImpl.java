@@ -1,23 +1,17 @@
 package com.example.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.entity.dto.Account;
 import com.example.entity.dto.Department;
 import com.example.entity.vo.request.DepartmentAddVO;
 import com.example.entity.vo.response.DepartmentVO;
-import com.example.mapper.AccountMapper;
 import com.example.mapper.DepartmentMapper;
 import com.example.service.AccountService;
 import com.example.service.DepartmentService;
 import com.github.yulichang.query.MPJQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService {

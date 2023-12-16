@@ -1,13 +1,11 @@
 package com.example;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.Department;
 import com.example.entity.vo.response.DepartmentVO;
 import com.example.mapper.DepartmentMapper;
 import com.example.service.AccountService;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.toolkit.MPJWrappers;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
