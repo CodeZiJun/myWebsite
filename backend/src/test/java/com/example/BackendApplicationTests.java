@@ -46,8 +46,8 @@ class BackendApplicationTests {
 //                        .select("acc.username")
 //                        .leftJoin("db_account acc on t.minister_id = acc.id"));
 //        vos.forEach(System.out::println);
-        String detail = "";
-        detail = "".equals(detail) ? null : detail;
+        String detail;
+        detail = null;
         List<DepartmentVO> vos = departmentMapper.selectJoinList( DepartmentVO.class,
                 new MPJQueryWrapper<Department>()
                         .selectAll(Department.class)

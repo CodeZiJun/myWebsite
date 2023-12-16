@@ -61,6 +61,14 @@ public class AccountController {
         return RestBean.success(iPage).toJsonString();
     }
 
+    @GetMapping(value = "/selectUsernameByEmail/{email}")
+    public String selectUsernameByEmail(@PathVariable("email") String email) {
+        if(accountService.selectOneByEmail(email) == null)
+            return RestBean.failure(400, "未查询到此邮箱用户").toJsonString();
+        else
+            return RestBean.success(new voUsername(accountService.selectOneByEmail(email).getUsername())).toJsonString();
+    }
+
     @DeleteMapping(value = "/delete/{id}")
     public String deleteAccountById(@PathVariable("id") Integer id) {
         if (accountService.removeById(id))

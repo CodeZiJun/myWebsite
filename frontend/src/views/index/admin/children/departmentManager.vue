@@ -1,6 +1,6 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
-import {del, delWithData, getWithData, post} from "@/net";
+import {del, delWithData, get, getWithData, post} from "@/net";
 import {ElMessage, ElNotification} from "element-plus";
 import {Delete, Edit, Message, Upload, User, Warning} from "@element-plus/icons-vue";
 import {myInfo} from "@/utils/profileUtils";
@@ -15,6 +15,8 @@ const totalPage = ref(20)
 const deleteDialogVisible = ref(false)
 const addDialogVisible = ref(false)
 const multipleSelection = ref([])
+const findUsername = ref("未查询到此邮箱用户")
+const color = ref("var(--el-color-danger-light-9)")
 
 const deleleDepartment = reactive({
   id: "",
@@ -62,6 +64,13 @@ const canSelect = (row, index) => {
     return row.email !== myInfo.value.email;
 }
 
+const validateEmail = (value) => {
+  const checkReg = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/ ;
+  if(value === "" || value === null)
+    return false;
+  else return checkReg.test(value);
+}
+
 const validateDepartmentName = (rule, value, callback) => {
   if(value === ''){
     callback(new Error('请输入部门名'))
@@ -72,8 +81,8 @@ const validateDepartmentName = (rule, value, callback) => {
   }
 }
 const rule = {
-  username: [
-    { validator: validateDepartmentName, trigger: ['blur', 'change'] },
+  departmentName: [
+    { validator: validateDepartmentName,required:true, trigger: ['blur', 'change'] },
     { min: 1, max: 20, message: '部门名的长度必须在1-10个字符之间', trigger: ['blur', 'change'] }
   ],
   email: [
@@ -83,7 +92,15 @@ const rule = {
 }
 
 const getUpdateDepartmentVos = () => {
-
+  const vos = []
+  for (let i = 0; i < departmentList.data.length; i ++){
+    vos.push({
+      departmentName: departmentList.data[i].departmentName,
+      email: departmentList.data[i].email,
+      id: departmentList.data[i].id
+    })
+  }
+  return vos;
 }
 const submitAddForm = () => {
   addFormRef.value.validate((valid) => {
@@ -114,6 +131,17 @@ const deleteOne = (id) => {
   )
   deleteDialogVisible.value = false
 }
+const submitAllModified = () => {
+  post("/api/department/updateBatch",
+      getUpdateDepartmentVos(),
+      () => {
+        getdata()
+        ElMessage.success("更新成功")
+      }, () => {
+        ElMessage.error("更新失败")
+        getdata()
+      })
+}
 const handleSizeChange = (val) => {
   departmentList.size = val
   getdata()
@@ -126,6 +154,21 @@ const handleInputChange = () => {
   details.detail = searchText
   getdata()
 }
+
+const handleAddDepartmentFindInput = (text) => {
+  if(validateEmail(text)){
+    get(`/api/account/selectUsernameByEmail/${text}`, (data) => {
+          findUsername.value = data.username
+          color.value = ""
+        }, () => {
+          findUsername.value = "未查询到该邮箱用户"
+          color.value = "var(--el-color-danger-light-9)"
+    }
+    )
+  }
+
+}
+
 const handleSelectionChange = (val) => {
   multipleSelection.value = val.map(v => v.id)
 }
@@ -218,12 +261,7 @@ onMounted(() => {
           <span v-else>{{ row.departmentName }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="部门负责人" align="center">
-        <template #default="{row}">
-          <el-input v-if="row.status" v-model="row.username"></el-input>
-          <span v-else>{{ row.username }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="username" label="部门负责人" align="center"></el-table-column>
       <el-table-column prop="email" label="负责人邮箱" align="center">
         <template #default="{row}">
           <el-input v-if="row.status" v-model="row.email"></el-input>
@@ -283,7 +321,7 @@ onMounted(() => {
         style="border-radius: 20px; display: flex; justify-items: center; width: 700px"
         draggable
     >
-      <el-form :model="addForm" label-width="90px" style="margin-top: 20px" :rules="rule" ref="addFormRef">
+      <el-form :model="addForm" label-width="100px" style="margin-top: 20px" :rules="rule" ref="addFormRef">
         <el-form-item prop="departmentName" label="部门名:">
           <el-input v-model="addForm.departmentName" maxlength="30" placeholder="设置新部门名字" style="width: 260px">
             <template #prefix>
@@ -291,15 +329,39 @@ onMounted(() => {
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item prop="minisiterId" label="负责人邮箱:">
-          <el-input v-model="addForm.email" maxlength="30" placeholder="请为新部门选定负责人" style="width: 260px">
+        <el-form-item prop="email" label="负责人邮箱:">
+          <el-input v-model="addForm.email"
+                    @input="handleAddDepartmentFindInput(addForm.email)"
+                    maxlength="30" placeholder="请为新部门选定负责人" style="width: 260px">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
           </el-input>
         </el-form-item>
+        <el-descriptions
+            :column="1"
+            border
+            style="margin-bottom: 10px"
+        >
+          <el-descriptions-item
+              label-class-name="my-label"
+              class-name="my-content">
+            <template #label>
+              <div class="cell-item">
+                <el-icon>
+                  <user />
+                </el-icon>
+                邮箱拥有者
+              </div>
+            </template>
+            {{ findUsername }}
+          </el-descriptions-item>
+        </el-descriptions>
         <el-form-item>
-          <el-button type="primary" @click="submitAddForm" style="width: 100px">确认</el-button>
+          <el-button type="primary"
+                     @click="submitAddForm"
+                     :disabled = " findUsername.value !== '未查询到此邮箱用户' "
+                     style="width: 100px">确认</el-button>
           <el-button type="warning" @click="evt => {addDialogVisible = false;addFormRef.resetFields();}" style="width: 100px;">取消</el-button>
         </el-form-item>
       </el-form>
@@ -308,5 +370,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+:deep(.my-label) {
+  background: var(--el-color-success-light-9) !important;
+  width: 120px;
+}
+:deep(.my-content) {
+  background: v-bind(color);
+}
 </style>

@@ -1,10 +1,8 @@
 package com.example.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.entity.dto.Account;
 import com.example.entity.dto.Department;
 import com.example.entity.vo.request.DepartmentAddVO;
 import com.example.entity.vo.response.DepartmentVO;
