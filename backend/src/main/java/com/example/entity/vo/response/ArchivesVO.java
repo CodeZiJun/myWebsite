@@ -22,4 +22,5 @@ public class ArchivesVO {
     String positionName;
     DateTime renewTime;
     String personalIntro;
+    String education;
 }

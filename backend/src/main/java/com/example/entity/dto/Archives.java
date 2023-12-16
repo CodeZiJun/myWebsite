@@ -27,4 +27,5 @@ public class Archives {
     Integer positionId;
     DateTime renewTime;
     String personalIntro;
+    String education;
 }
