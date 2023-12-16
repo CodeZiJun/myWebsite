@@ -332,6 +332,7 @@ onMounted(() => {
         <el-form-item prop="email" label="负责人邮箱:">
           <el-input v-model="addForm.email"
                     @input="handleAddDepartmentFindInput(addForm.email)"
+                    clearable
                     maxlength="30" placeholder="请为新部门选定负责人" style="width: 260px">
             <template #prefix>
               <el-icon><User /></el-icon>

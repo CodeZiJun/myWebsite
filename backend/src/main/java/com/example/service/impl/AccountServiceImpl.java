@@ -100,7 +100,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (this.existsAccountByEmail(email)) return "此电子邮箱已被注册！";
         if (this.existsAccountByUsername(username)) return "此用户名已被注册！";
         String password = encoder.encode(vo.getPassword());
-        Account account = new Account(null, username, password, email, "user", new Date(), null);
+        Account account = new Account(null, username, password, email, "user", new Date(), null, null, null);
         if (this.save(account)) {
             stringRedisTemplate.delete(key);
             return null;
@@ -115,7 +115,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         String username = vo.getUsername();
         String role = vo.getRole();
         String password = encoder.encode(vo.getUsername());
-        Account account = new Account(null, username, password, email, role, new Date(), null);
+        Account account = new Account(null, username, password, email, role, new Date(), null, null, null);
         if (this.save(account))
             return null;
         else

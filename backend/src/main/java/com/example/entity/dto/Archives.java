@@ -1,5 +1,6 @@
 package com.example.entity.dto;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,18 +11,20 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@TableName("db_account")
-@NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+@NoArgsConstructor
+@TableName("db_archives")
+public class Archives {
     @TableId(type = IdType.AUTO)
     Integer id;
-    String username;
-    String password;
-    String email;
-    String role;
-    Date registerTime;
-    String avatar;
-    Integer archivesId;
-    Integer workplaceId;
+    String realName;
+    String gender;
+    String telephone;
+    String address;
+    String personalId;
+    Date entryDate;
+    Integer departmentId;
+    Integer positionId;
+    DateTime renewTime;
+    String personalIntro;
 }
