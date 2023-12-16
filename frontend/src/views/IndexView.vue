@@ -6,7 +6,7 @@ import {
   ArrowRight,
   Avatar, CreditCard,
   Fold, FullScreen,
-  Grid,
+  Grid, Guide,
   Histogram, HomeFilled,
   List, Management,
   Memo,
@@ -158,6 +158,10 @@ onMounted(
                 <el-icon><HomeFilled /></el-icon>
                 <span>部门管理</span>
               </template>
+            </el-menu-item>
+            <el-menu-item index="/admin/position">
+              <el-icon><Guide /></el-icon>
+              <span>职位管理</span>
             </el-menu-item>
           </el-sub-menu>
         </el-menu>

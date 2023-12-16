@@ -147,7 +147,7 @@ const router = createRouter({
                             path: 'staff',
                             name: 'index-admin-staff',
                             meta: {
-                                description: '职工管理',
+                                description: '账户管理',
                                 parentRouteName: 'index-admin'
                             },
                             component: () => import('@/views/index/admin/children/staffManager.vue')
@@ -159,6 +159,14 @@ const router = createRouter({
                                 parentRouteName: 'index-admin'
                             },
                             component: () => import('@/views/index/admin/children/departmentManager.vue')
+                        }, {
+                            path: 'position',
+                            name: 'index-admin-position',
+                            meta: {
+                                description: '职位管理',
+                                parentRouteName: 'index-admin'
+                            },
+                            component: () => import('@/views/index/admin/children/positionManager.vue')
                         }
                     ]
                 }, {

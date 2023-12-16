@@ -1,25 +1,22 @@
 package com.example;
 
 import com.example.entity.dto.Account;
-import com.example.entity.dto.Department;
 import com.example.entity.vo.response.ArchivesVO;
-import com.example.entity.vo.response.DepartmentVO;
 import com.example.mapper.DepartmentMapper;
 import com.example.service.AccountService;
 import com.example.service.ArchivesService;
-import com.github.yulichang.query.MPJQueryWrapper;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
-import java.util.List;
 
 @SpringBootTest
 class BackendApplicationTests {
     @Resource
     ArchivesService archivesService;
+
     @Resource
     AccountService service;
     @Resource
