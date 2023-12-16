@@ -17,7 +17,7 @@ const addDialogVisible = ref(false)
 const multipleSelection = ref([])
 const findUsername = ref("未查询到此邮箱用户")
 const color = ref("var(--el-color-danger-light-9)")
-
+const disableFlag = ref(true)
 const deleleDepartment = reactive({
   id: "",
   departmentName: "",
@@ -118,6 +118,7 @@ const submitAddForm = () => {
       ElMessage.warning("请检查表单内容！")
     }
   })
+  disableFlag.value = false
 }
 const deleteOne = (id) => {
   del(`/api/department/delete/${id}`,
@@ -159,9 +160,11 @@ const handleAddDepartmentFindInput = (text) => {
   if(validateEmail(text)){
     get(`/api/account/selectUsernameByEmail/${text}`, (data) => {
           findUsername.value = data.username
+          disableFlag.value = true;
           color.value = ""
         }, () => {
           findUsername.value = "未查询到该邮箱用户"
+          disableFlag.value = false;
           color.value = "var(--el-color-danger-light-9)"
     }
     )
@@ -321,7 +324,7 @@ onMounted(() => {
         style="border-radius: 20px; display: flex; justify-items: center; width: 700px"
         draggable
     >
-      <el-form :model="addForm" label-width="100px" style="margin-top: 20px" :rules="rule" ref="addFormRef">
+      <el-form :model="addForm" label-width="120px" style="margin-top: 20px" :rules="rule" ref="addFormRef">
         <el-form-item prop="departmentName" label="部门名:">
           <el-input v-model="addForm.departmentName" maxlength="30" placeholder="设置新部门名字" style="width: 260px">
             <template #prefix>
@@ -361,9 +364,16 @@ onMounted(() => {
         <el-form-item>
           <el-button type="primary"
                      @click="submitAddForm"
-                     :disabled = " findUsername.value !== '未查询到此邮箱用户' "
+                     :disabled = !disableFlag
                      style="width: 100px">确认</el-button>
-          <el-button type="warning" @click="evt => {addDialogVisible = false;addFormRef.resetFields();}" style="width: 100px;">取消</el-button>
+          <el-button type="warning"
+                     @click="() => {
+            addDialogVisible = false;
+            addFormRef.resetFields();
+            disableFlag=false;
+            findUsername = '未查询到此邮箱用户'
+            color = 'var(--el-color-danger-light-9)'
+          }" style="width: 100px;">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
