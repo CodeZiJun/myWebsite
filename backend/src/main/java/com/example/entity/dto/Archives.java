@@ -24,7 +24,7 @@ public class Archives {
     Date entryDate;
     Integer departmentId;
     Integer positionId;
-    java.sql.Date renewTime;
+    Date renewTime;
     String personalIntro;
     String education;
 }

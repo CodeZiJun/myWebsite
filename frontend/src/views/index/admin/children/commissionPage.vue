@@ -61,7 +61,17 @@ onMounted(() => {
       <el-input style="width: 200px" placeholder="查询名称" v-model="searchText" @input="handleInputChange"></el-input>
       <el-button type="info" style="margin-left: 10px" @click="() => {searchText = '';getdata()}">重置</el-button>
       <el-button type="success" style="margin-left: 10px" @click="selectAll">查询所有</el-button>
-      <el-button type="danger" style="margin-left: 10px" plain @click="selectNArc">无档案账户</el-button>
+      <el-popover
+          placement="top-start"
+          title="Tips:"
+          :width="200"
+          trigger="hover"
+          content="账户拥有个人档案才能对职位、部门进行操作哦"
+      >
+        <template #reference>
+          <el-button type="danger" style="margin-left: 10px" plain @click="selectNArc">无档案账户</el-button>
+        </template>
+      </el-popover>
       <el-button v-if="!show" type="success" style="margin-left: 10px" plain @click="show = true">有档案账户</el-button>
       <span v-else>
         <el-button style="margin-left: 10px" type="warning" plain @click="selectNDepNPos">无部门无职位</el-button>
@@ -76,16 +86,17 @@ onMounted(() => {
               highlight-current-row
               border>
       <el-table-column prop="id" label="序号" width="70" align="center"></el-table-column>
-      <el-table-column prop="username" label="用户名" align="center"></el-table-column>
-      <el-table-column prop="realName" label="真实姓名" align="center"></el-table-column>
+      <el-table-column prop="archivesId" label="档案编号" min-width="90" align="center"></el-table-column>
+      <el-table-column prop="username" label="用户名" min-width="100" align="center"></el-table-column>
+      <el-table-column prop="realName" label="真实姓名" min-width="100" align="center"></el-table-column>
       <el-table-column prop="email" label="用户邮箱" min-width="220" align="center"></el-table-column>
       <el-table-column prop="departmentName" label="所属部门" align="center"></el-table-column>
       <el-table-column prop="positionName" label="所居职位" align="center"></el-table-column>
-      <el-table-column prop="entryDate" label="入职时间" min-width="150" align="center"></el-table-column>
-      <el-table-column label="设置" align="center" width="180">
+      <el-table-column prop="entryDate" label="入职时间" min-width="160" align="center"></el-table-column>
+      <el-table-column label="设置" align="center" width="150">
         <template v-slot="scope" #default="{row}">
-          <el-button size="small" type="primary" plain>部门</el-button>
-          <el-button size="small" type="warning" plain>职位</el-button>
+          <el-button size="small" type="primary" :disabled="scope.row.archivesId === null" plain>部门</el-button>
+          <el-button size="small" type="warning" :disabled="scope.row.archivesId === null" plain>职位</el-button>
         </template>
       </el-table-column>
     </el-table>

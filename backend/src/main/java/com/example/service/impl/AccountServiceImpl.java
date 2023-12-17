@@ -163,7 +163,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             Account account = findByNameOrEmail(userDetails.getUsername());
-            UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(),file);
+            UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(), file);
             account.setAvatar(uploadFile.getType() + "/" + uploadFile.getFileName());
             boolean update = this.update().eq("email",account.getEmail()).set("avatar", account.getAvatar()).update();
             if(update)
