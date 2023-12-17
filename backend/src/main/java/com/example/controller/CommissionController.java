@@ -15,16 +15,17 @@ import org.springframework.web.bind.annotation.*;
 public class CommissionController {
     @Resource
     CommissionService service;
-    @GetMapping(value = "/selectPage/{pageNum}/{pageSize}")
+    @GetMapping(value = "/selectPage/{pageNum}/{pageSize}/{flag}")
     public String selectAllcommissionStatus(@PathVariable Integer pageNum,
                                             @PathVariable Integer pageSize,
+                                            @PathVariable Integer flag,
                                             @RequestParam(required = false) String detail) {
         Page<CommissionVO> page = new Page<>(pageNum, pageSize);
         IPage<CommissionVO> iPage;
         if (detail == null) {
-            iPage = service.selectCommissionPage(page);
+            iPage = service.selectCommissionPage(page,flag);
         } else {
-            iPage = service.selectCommissionByDetailPage(page, detail);
+            iPage = service.selectCommissionByDetailPage(page, detail,flag);
         }
         return RestBean.success(iPage).toJsonString();
     }
