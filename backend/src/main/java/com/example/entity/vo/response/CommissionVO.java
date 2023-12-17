@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommissionVO {
+    Integer id;
     String username;
     String realName;
     String email;
