@@ -32,7 +32,7 @@ import {ElMessage} from "element-plus";
 
 const option = {
   title: {
-    text: '订单销售的趋势图',
+    text: '角色数量趋势图',
     left: 'center'
   },
   tooltip: {
@@ -154,7 +154,6 @@ export default {
 
     get(`/api/account/charts`,
         (res) => {
-          console.log(res)
           option.xAxis.data = res.line.map(v => v.role)
           option.series[0].data = res.line.map(v => v.value)
           lineChart.setOption(option)
@@ -162,8 +161,6 @@ export default {
           option1.xAxis.data = res.line.map(v => v.role)
           option1.series[1].data = res.line.map(v => v.value)
           barChart.setOption(option1)
-
-
 
           option2.series[0].data = res.line
           pieChart.setOption(option2)

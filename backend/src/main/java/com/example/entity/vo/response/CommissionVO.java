@@ -9,17 +9,11 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArchivesVO {
-    Integer id;
+public class CommissionVO {
+    String username;
     String realName;
-    String gender;
-    String telephone;
-    String address;
-    String personalId;
-    Date entryDate;
+    String email;
     String departmentName;
     String positionName;
-    Date renewTime;
-    String personalIntro;
-    String education;
+    Date entryDate;
 }

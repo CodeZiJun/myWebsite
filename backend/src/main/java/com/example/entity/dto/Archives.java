@@ -1,6 +1,5 @@
 package com.example.entity.dto;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -25,7 +24,7 @@ public class Archives {
     Date entryDate;
     Integer departmentId;
     Integer positionId;
-    DateTime renewTime;
+    java.sql.Date renewTime;
     String personalIntro;
     String education;
 }

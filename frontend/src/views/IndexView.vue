@@ -163,6 +163,10 @@ onMounted(
               <el-icon><Guide /></el-icon>
               <span>职位管理</span>
             </el-menu-item>
+            <el-menu-item index="/admin/commission">
+              <el-icon><Management /></el-icon>
+              <span>任命管理</span>
+            </el-menu-item>
           </el-sub-menu>
         </el-menu>
     </el-aside>

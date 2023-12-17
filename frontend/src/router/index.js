@@ -167,6 +167,14 @@ const router = createRouter({
                                 parentRouteName: 'index-admin'
                             },
                             component: () => import('@/views/index/admin/children/positionManager.vue')
+                        }, {
+                            path: 'commission',
+                            name: 'index-admin-commission',
+                            meta: {
+                                description: '任命管理',
+                                parentRouteName: 'index-admin'
+                            },
+                            component: () => import('@/views/index/admin/children/commissionPage.vue')
                         }
                     ]
                 }, {
