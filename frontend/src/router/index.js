@@ -147,7 +147,7 @@ const router = createRouter({
                             path: 'staff',
                             name: 'index-admin-staff',
                             meta: {
-                                description: '职工管理',
+                                description: '账户管理',
                                 parentRouteName: 'index-admin'
                             },
                             component: () => import('@/views/index/admin/children/staffManager.vue')
@@ -159,6 +159,22 @@ const router = createRouter({
                                 parentRouteName: 'index-admin'
                             },
                             component: () => import('@/views/index/admin/children/departmentManager.vue')
+                        }, {
+                            path: 'position',
+                            name: 'index-admin-position',
+                            meta: {
+                                description: '职位管理',
+                                parentRouteName: 'index-admin'
+                            },
+                            component: () => import('@/views/index/admin/children/positionManager.vue')
+                        }, {
+                            path: 'commission',
+                            name: 'index-admin-commission',
+                            meta: {
+                                description: '任命管理',
+                                parentRouteName: 'index-admin'
+                            },
+                            component: () => import('@/views/index/admin/children/commissionPage.vue')
                         }
                     ]
                 }, {
@@ -207,6 +223,8 @@ router.beforeEach((to, from, next) => {
     if(to.name.startsWith('welcome-') && !isUnauthorized) {
         next('/index')
     } else if (to.fullPath.startsWith('/index') && isUnauthorized){
+        next('/')
+    } else if (to.fullPath.startsWith('/admin') && isUnauthorized) {
         next('/')
     } else {
         next()

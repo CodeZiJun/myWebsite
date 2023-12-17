@@ -33,7 +33,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
                         .leftJoin("db_account acc on t.minister_id = acc.id"));
         else
             return selectDepartmentPage(page);
-
     }
 
     @Override

@@ -32,7 +32,7 @@ import {ElMessage} from "element-plus";
 
 const option = {
   title: {
-    text: '订单销售的趋势图',
+    text: '角色数量趋势图',
     left: 'center'
   },
   tooltip: {
@@ -152,25 +152,22 @@ export default {
     pieChart.setOption(option2)
 
 
-      get(`/api/account/charts`,
-          (res) => {
-            console.log(res)
-            option.xAxis.data = res.line.map(v => v.role)
-            option.series[0].data = res.line.map(v => v.value)
-            lineChart.setOption(option)
+    get(`/api/account/charts`,
+        (res) => {
+          option.xAxis.data = res.line.map(v => v.role)
+          option.series[0].data = res.line.map(v => v.value)
+          lineChart.setOption(option)
 
-            option1.xAxis.data = res.line.map(v => v.role)
-            option1.series[1].data = res.line.map(v => v.value)
-            barChart.setOption(option1)
+          option1.xAxis.data = res.line.map(v => v.role)
+          option1.series[1].data = res.line.map(v => v.value)
+          barChart.setOption(option1)
 
-
-
-            option2.series[0].data = res.line
-            pieChart.setOption(option2)
-            console.log(option.xAxis)
-          }, () => {
-            ElMessage.error("数据请求失败！")
-          })
+          option2.series[0].data = res.line
+          pieChart.setOption(option2)
+          console.log(option.xAxis)
+        }, () => {
+          ElMessage.error("数据请求失败！")
+        })
   },
   methods: {}
 }

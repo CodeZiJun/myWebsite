@@ -17,70 +17,70 @@ export default {
   name: "Home",
   data:function (){
 
-return {
-  contentList: [
-    {
-      id: '1',
-      img: stepImg1,
-      text:"人事信息查询"
-    },
-    {
-      id: '2',
-      img: stepImg2,
-      text:"人事信息管理"
-    },
-    {
-      id: '3',
-      img: stepImg3,
-      text:"多角色系统"
-    },
-    {
-      id: '4',
-      img: stepImg4,
-      text:"招聘信息"
-    },
-    {
-      id: '5',
-      img: stepImg5,
-      text:"多文件上传"
-    },
-    {
-      id: '6',
-      img: stepImg6,
-      text:"信息维护"
-    },
-    {
-      id: '7',
-      img: stepImg7,
-      text:"数据可视化"
-    },
-    {
-      id: '8',
-      img: stepImg8,
-      text:"更多功能开发中。。。"
-    },
-  ],
+    return {
+      contentList: [
+        {
+          id: '1',
+          img: stepImg1,
+          text:"人事信息查询"
+        },
+        {
+          id: '2',
+          img: stepImg2,
+          text:"人事信息管理"
+        },
+        {
+          id: '3',
+          img: stepImg3,
+          text:"多角色系统"
+        },
+        {
+          id: '4',
+          img: stepImg4,
+          text:"招聘信息"
+        },
+        {
+          id: '5',
+          img: stepImg5,
+          text:"多文件上传"
+        },
+        {
+          id: '6',
+          img: stepImg6,
+          text:"信息维护"
+        },
+        {
+          id: '7',
+          img: stepImg7,
+          text:"数据可视化"
+        },
+        {
+          id: '8',
+          img: stepImg8,
+          text:"更多功能开发中。。。"
+        },
+      ],
 
-  coders: [
-    {
-      id: '1',
-      img: windleaf,
-      text:"windleaf 庄洋"
-    },
-    {
-      id: '2',
-      img: codezj,
-      text:"codezj 赖紫骏"
-    },
-    {
-      id: '3',
-      img: jayjaylu,
-      text:"jayjaylu 陆子杰"
-    },
+      coders: [
+        {
+          id: '1',
+          img: windleaf,
+          text:"windleaf 庄洋"
+        },
+        {
+          id: '2',
+          img: codezj,
+          text:"codezj 赖紫骏"
+        },
+        {
+          id: '3',
+          img: jayjaylu,
+          text:"jayjaylu 陆子杰"
+        },
 
-  ],
+      ],
 
-}
+    }
 
   }
 };
@@ -136,7 +136,7 @@ return {
         </button>
       </div>
     </div>
-    </div>
+  </div>
   <section class="my-5 section">
     <div class="container">
       <h2 class="text-center mb-4">我们提供的服务</h2>
@@ -160,30 +160,30 @@ return {
     </div>
   </section>
   <section class="bg-light py-5 section section-alternate contributors-section">
-      <div class="container">
-        <h2 class="text-center mb-4">Contributors</h2>
-        <div class="row">
-          <div class="col-md-4 mb-4 text-center" v-for="(item,index) in coders " :key="n">
-            <div class="p-4 shadow-sm rounded h-100 contributor-card">
-              <i class="bi bi-star-fill fs-1 text-primary"></i>
-              <h4 class="mt-3">Feature {{ n }}</h4> <img
-                :src="item.img"
-                class="card-img-top"
-                alt="瀑布流图片"
-            />
-              <p>{{item.text}}</p>
-            </div>
+    <div class="container">
+      <h2 class="text-center mb-4">Contributors</h2>
+      <div class="row">
+        <div class="col-md-4 mb-4 text-center" v-for="(item,index) in coders " :key="n">
+          <div class="p-4 shadow-sm rounded h-100 contributor-card">
+            <i class="bi bi-star-fill fs-1 text-primary"></i>
+            <h4 class="mt-3">Feature {{ n }}</h4> <img
+              :src="item.img"
+              class="card-img-top"
+              alt="瀑布流图片"
+          />
+            <p>{{item.text}}</p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer class="bg-dark text-white text-center py-3 mt-4">
-      <div class="container">
-        <p class="mb-0">&copy; 2023 Introduction Page of the Management Sysytem</p>
-        <small> based on Java Springboot and Vue</small>
-      </div>
-    </footer>
+  <footer class="bg-dark text-white text-center py-3 mt-4">
+    <div class="container">
+      <p class="mb-0">&copy; 2023 Introduction Page of the Management Sysytem</p>
+      <small> based on Java Springboot and Vue</small>
+    </div>
+  </footer>
 
 </template>
 

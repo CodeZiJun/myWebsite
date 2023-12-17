@@ -1,6 +1,7 @@
 package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,6 +19,7 @@ import com.example.utils.FlowUtils;
 import com.example.utils.UploadFileUtils;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,11 +30,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Primary
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
 
@@ -101,7 +102,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (this.existsAccountByEmail(email)) return "此电子邮箱已被注册！";
         if (this.existsAccountByUsername(username)) return "此用户名已被注册！";
         String password = encoder.encode(vo.getPassword());
-        Account account = new Account(null, username, password, email, "user", new Date(), null);
+        Account account = new Account(null, username, password, email, "user", new Date(), null, null, null);
         if (this.save(account)) {
             stringRedisTemplate.delete(key);
             return null;
@@ -109,6 +110,27 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return "内部错误，请联系管理员";
         }
     }
+
+    @Override
+    public String addAccount(AccountAddVO vo) {
+        String email = vo.getEmail();
+        String username = vo.getUsername();
+        String role = vo.getRole();
+        String password = encoder.encode(vo.getUsername());
+        Account account = new Account(null, username, password, email, role, new Date(), null, null, null);
+        if (this.save(account))
+            return null;
+        else
+            return "内部错误，请联系管理员";
+    }
+
+    @Override
+    public Account selectOneByEmail(String email) {
+        QueryWrapper<Account> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        return accountMapper.selectOne(wrapper);
+    }
+
 
     @Override
     public String resetConfirm(ConfirmResetVO vo) {
@@ -141,7 +163,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             Account account = findByNameOrEmail(userDetails.getUsername());
-            UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(),file);
+            UploadFile uploadFile = uploadFileUtils.upload(account.getUsername(), file.getOriginalFilename(), file);
             account.setAvatar(uploadFile.getType() + "/" + uploadFile.getFileName());
             boolean update = this.update().eq("email",account.getEmail()).set("avatar", account.getAvatar()).update();
             if(update)
@@ -162,47 +184,20 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return "内部错误，请联系管理员";
     }
 
-    /**
-     * @param page
-     * @param wrapper
-     * @return
-     */
     @Override
     public IPage<Account> selectAccountPage(Page<Account> page, Wrapper<Account> wrapper) {
-        return null;
+        return accountMapper.selectPage(page, wrapper);
     }
 
-    /**
-     * @param page
-     * @param detail
-     * @return
-     */
     @Override
     public IPage<Account> selectAccountByDetailPage(Page<Account> page, String detail) {
-        return null;
-    }
-
-    /**
-     * @param vo
-     * @return
-     */
-    @Override
-    public String addAccount(AccountAddVO vo) {
-        return null;
-    }
-
-    /**
-     * @param email
-     * @return
-     */
-    @Override
-    public Account selectOneByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public IPage<Account> selectAccountPage(Page<Account> page) {
-        return accountMapper.selectPage(page, null);
+        QueryWrapper<Account> wrapper = new QueryWrapper<>();
+        if (!"".equals(detail)) {
+            wrapper.like("username", detail).or()
+                    .like("email", detail).or()
+                    .eq("role", detail);
+        }
+        return selectAccountPage(page, wrapper);
     }
 
     private boolean verifyLimit(String ip) {

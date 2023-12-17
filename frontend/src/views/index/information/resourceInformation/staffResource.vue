@@ -3,7 +3,11 @@
 </script>
 
 <template>
-  <h1>职工资源目录</h1>
+  <div>
+    <el-collapse>
+
+    </el-collapse>
+  </div>
 </template>
 
 <style scoped>

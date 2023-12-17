@@ -51,7 +51,7 @@ const realTime = () => {
       previewURL.value = URL.createObjectURL(data)
       loading.value = false
     })
-  }, 200)
+  }, 150)
 }
 // 初始化
 const imgLoad = (msg) => {

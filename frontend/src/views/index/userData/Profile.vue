@@ -47,7 +47,7 @@ function handleClick(tab) {
                   class="image"
                   alt=""/>
               <div style="padding: 10px; margin-left: 10px">
-                <h1>祝您拥有好心情!</h1>
+                <h4>祝您拥有好心情!</h4>
                 <div class="bottom">
                   <time class="time">{{ currentDate }}</time>
                 </div>

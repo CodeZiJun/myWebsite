@@ -1,54 +1,76 @@
 <script setup>
-import {ref, reactive, onMounted} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {del, delWithData, get, getWithData, post} from "@/net";
 import {ElMessage, ElNotification} from "element-plus";
-import {Delete, Edit, Message, Upload, User, Warning} from "@element-plus/icons-vue";
+import {Delete, Edit, Upload, User, Warning} from "@element-plus/icons-vue";
 import {myInfo} from "@/utils/profileUtils";
 
 let searchText = ref("")
 let flagOpenTip = 0
 let flagCloseTip = 0
-const addFormRef = ref()
+const deleteDialogVisible = ref(false)
+const multipleSelection = ref([])
+const addDialogVisible = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalPage = ref(20)
-const deleteDialogVisible = ref(false)
-const addDialogVisible = ref(false)
-const multipleSelection = ref([])
-const findUsername = ref("未查询到此邮箱用户")
-const color = ref("var(--el-color-danger-light-9)")
+const findSalary = ref("错误等级")
 const disableFlag = ref(true)
-const deleleDepartment = reactive({
-  id: "",
-  departmentName: "",
-  username: "",
-  email: ""
+const addFormRef = ref()
+const color = ref("var(--el-color-danger-light-9)")
+const validateSalaryId = (value) => {
+  const checkReg = /^(2000|200[0-9]|201[0-9]|202[0-9]|2030)$/ ;
+  if(value === "" || value === null)
+    return false;
+  else return checkReg.test(value);
+}
+const addForm = reactive({
+  positionName: '',
+  salaryId: ''
 })
-
+const delelePosition = reactive({
+  id: "",
+  positionName: "",
+  amount: "",
+})
+const canSelect = (row, index) => {
+  return row.email !== myInfo.value.email;
+}
 let details = new reactive({
   detail: null
 })
-let departmentList = new reactive({
+const handleSelectionChange = (val) => {
+  multipleSelection.value = val.map(v => v.id)
+}
+let positionList = new reactive({
   current: 1,
   total: null,
   size: 10,
   data: []
 })
-const addForm = reactive({
-  departmentName: '',
-  email: ''
-})
-
-const confirmDeleteOne = (id, departmentName, username, email) => {
-  deleleDepartment.id = id
-  deleleDepartment.departmentName = departmentName
-  deleleDepartment.username = username
-  deleleDepartment.email = email
+const confirmDeleteOne = (id, positionName, amount) => {
+  delelePosition.id = id
+  delelePosition.departmentName = positionName
+  delelePosition.amount = amount
   deleteDialogVisible.value = true
 }
+const getdata = () => {
+  getWithData(`/api/position/selectPage/${positionList.current}/${positionList.size}`,
+      details
+      ,(data) => {
+        totalPage.value = data.total
+        positionList.data = data.records
+        for(let i = 0; i < positionList.data.length; i ++) {
+          positionList.data[i].status = false
+        }
+      }, () => {
+        ElMessage.error("数据请求失败！")
+      })
+}
+
 const deleteBatch = () => {
   const ids = multipleSelection.value
-  delWithData('/api/department/deleteBatch',
+  delWithData('/api/position/deleteBatch',
       ids,
       () => {
         getdata()
@@ -59,69 +81,8 @@ const deleteBatch = () => {
       }
   )
 }
-
-const canSelect = (row, index) => {
-    return row.email !== myInfo.value.email;
-}
-
-const validateEmail = (value) => {
-  const checkReg = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/ ;
-  if(value === "" || value === null)
-    return false;
-  else return checkReg.test(value);
-}
-
-const validateDepartmentName = (rule, value, callback) => {
-  if(value === ''){
-    callback(new Error('请输入部门名'))
-  } else if (!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) {
-    callback(new Error('不可包含特殊字符'))
-  } else {
-    callback()
-  }
-}
-const rule = {
-  departmentName: [
-    { validator: validateDepartmentName,required:true, trigger: ['blur', 'change'] },
-    { min: 1, max: 20, message: '部门名的长度必须在1-10个字符之间', trigger: ['blur', 'change'] }
-  ],
-  email: [
-    { required: true, message: '请输入电子邮件地址', trigger: 'blur' },
-    { type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change']}
-  ],
-}
-
-const getUpdateDepartmentVos = () => {
-  const vos = []
-  for (let i = 0; i < departmentList.data.length; i ++){
-    vos.push({
-      departmentName: departmentList.data[i].departmentName,
-      email: departmentList.data[i].email,
-      id: departmentList.data[i].id
-    })
-  }
-  return vos;
-}
-const submitAddForm = () => {
-  addFormRef.value.validate((valid) => {
-    if (valid) {
-      post('/api/department/addDepartment', {...addForm},
-          () => {
-            getdata()
-            ElMessage.success("添加成功")
-          }, () => {
-          getdata();
-          ElMessage.error("添加失败")})
-      addDialogVisible.value = false
-      addFormRef.value.resetFields();
-    } else {
-      ElMessage.warning("请检查表单内容！")
-    }
-  })
-  disableFlag.value = false
-}
 const deleteOne = (id) => {
-  del(`/api/department/delete/${id}`,
+  del(`/api/position/delete/${id}`,
       () => {
         getdata()
         ElMessage.success("删除成功")
@@ -132,9 +93,20 @@ const deleteOne = (id) => {
   )
   deleteDialogVisible.value = false
 }
+const getUpdatePositionVos = () => {
+  const vos = []
+  for (let i = 0; i < positionList.data.length; i ++){
+    vos.push({
+      positionName: positionList.data[i].positionName,
+      amount: positionList.data[i].amount,
+      id: positionList.data[i].id
+    })
+  }
+  return vos;
+}
 const submitAllModified = () => {
-  post("/api/department/updateBatch",
-      getUpdateDepartmentVos(),
+  post("/api/position/updateBatch",
+      getUpdatePositionVos(),
       () => {
         getdata()
         ElMessage.success("更新成功")
@@ -143,37 +115,23 @@ const submitAllModified = () => {
         getdata()
       })
 }
-const handleSizeChange = (val) => {
-  departmentList.size = val
-  getdata()
-}
-const handleCurrentChange = (val) => {
-  departmentList.current = val
-  getdata()
-}
 const handleInputChange = () => {
   details.detail = searchText
   getdata()
 }
-
-const handleAddDepartmentFindInput = (text) => {
-  if(validateEmail(text)){
-    get(`/api/account/selectUsernameByEmail/${text}`, (data) => {
-          findUsername.value = data.username
-          disableFlag.value = true;
-          color.value = ""
-        }, () => {
-          findUsername.value = "未查询到该邮箱用户"
-          disableFlag.value = false;
-          color.value = "var(--el-color-danger-light-9)"
-    }
-    )
-  }
-
+const openEditTip = () => {
+  ElNotification({
+    title: '编辑Tip',
+    message: '双击或单击编辑按钮开始编辑，选中其他行结束',
+    type: 'success',
+  })
 }
-
-const handleSelectionChange = (val) => {
-  multipleSelection.value = val.map(v => v.id)
+const closeEditTip = () => {
+  ElNotification({
+    title: '保存Tip',
+    message: '每次切换页面或翻页表格前记得提交修改哦',
+    type: 'warning',
+  })
 }
 const editOpen = (row) => {
   if (!flagOpenTip) {
@@ -191,32 +149,45 @@ const editClose = (currentRow, oldCurrentRow) => {
     }
   }
 }
-const openEditTip = () => {
-  ElNotification({
-    title: '编辑Tip',
-    message: '双击或单击编辑按钮开始编辑，选中其他行结束',
-    type: 'success',
-  })
+const handleSizeChange = (val) => {
+  positionList.size = val
+  getdata()
 }
-const closeEditTip = () => {
-  ElNotification({
-    title: '保存Tip',
-    message: '每次切换页面或翻页表格前记得提交修改哦',
-    type: 'warning',
-  })
+const handleCurrentChange = (val) => {
+  positionList.current = val
+  getdata()
 }
-const getdata = () => {
-  getWithData(`/api/department/selectPage/${departmentList.current}/${departmentList.size}`,
-      details
-      ,(data) => {
-        totalPage.value = data.total
-        departmentList.data = data.records
-        for(let i = 0; i < departmentList.data.length; i ++) {
-          departmentList.data[i].status = false
+const handleAddPositionFindInput = (text) => {
+  if(validateSalaryId(text)){
+    get(`/api/position/selectSalaryById/${text}`, (data) => {
+          findSalary.value = data.amount
+          disableFlag.value = true;
+          color.value = ""
+        }, () => {
+          findSalary.value = "错误等级"
+          disableFlag.value = false;
+          color.value = "var(--el-color-danger-light-9)"
         }
-      }, () => {
-        ElMessage.error("数据请求失败！")
-      })
+    )
+  }
+}
+const submitAddForm = () => {
+  addFormRef.value.validate((valid) => {
+    if (valid) {
+      post('/api/position/addPosition', {...addForm},
+          () => {
+            getdata()
+            ElMessage.success("添加成功")
+          }, () => {
+            getdata();
+            ElMessage.error("添加失败")})
+      addDialogVisible.value = false
+      addFormRef.value.resetFields();
+    } else {
+      ElMessage.warning("请检查表单内容！")
+    }
+  })
+  disableFlag.value = false
 }
 onMounted(() => {
   getdata()
@@ -232,7 +203,7 @@ onMounted(() => {
     </div>
 
     <div style="margin: 10px 0">
-      <el-button type="primary" @click="evt => {addDialogVisible = true}" plain :icon="Upload">新增部门</el-button>
+      <el-button type="primary" @click="evt => {addDialogVisible = true}" plain :icon="Upload">新增职位</el-button>
       <el-popconfirm
           width="220"
           confirm-button-text="确认"
@@ -249,7 +220,7 @@ onMounted(() => {
       <el-button type="success" plain :icon="Edit" @click="submitAllModified">提交修改</el-button>
     </div>
 
-    <el-table :data="departmentList.data"
+    <el-table :data="positionList.data"
               :header-cell-style="{ backgroundColor: 'aliceblue', color: '#666' }"
               @selection-change="handleSelectionChange"
               @cell-dblclick="editOpen"
@@ -258,24 +229,21 @@ onMounted(() => {
               border>
       <el-table-column type="selection" width="55" align="center" :selectable="canSelect"></el-table-column>
       <el-table-column prop="id" label="序号" width="70" align="center"></el-table-column>
-      <el-table-column prop="departmentName" label="部门名" align="center">
+      <el-table-column prop="positionName" label="职位名" align="center">
         <template #default="{row}">
-          <el-input v-if="row.status" v-model="row.departmentName"></el-input>
-          <span v-else>{{ row.departmentName }}</span>
+          <el-input v-if="row.status" v-model="row.positionName"></el-input>
+          <span v-else>{{ row.positionName }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="部门负责人" align="center"></el-table-column>
-      <el-table-column prop="email" label="负责人邮箱" align="center">
+      <el-table-column prop="amount" label="底薪情况" align="center" sortable>
         <template #default="{row}">
-          <el-input v-if="row.status" v-model="row.email"></el-input>
-          <span v-else>{{ row.email }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="180">
         <template v-slot="scope" #default="{row}">
           <el-button size="small" type="primary" plain @click="editOpen(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" plain :disabled="scope.row.status"
-                     @click="confirmDeleteOne(scope.row.id, scope.row.departmentName, scope.row.username, scope.row.email)">删除</el-button>
+                     @click="confirmDeleteOne(scope.row.id, scope.row.positionName, scope.row.amount)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -301,42 +269,40 @@ onMounted(() => {
       <span style="font-size: 16px">
         您将要删除部门信息，请确认！
         <br>
-        <strong>部门ID:{{ deleleDepartment.id }}</strong>
+        <strong>职位ID:{{ delelePosition.id }}</strong>
         <br>
-        <strong>部门名: {{ deleleDepartment.departmentName }}</strong>
+        <strong>职位名称: {{ delelePosition.positionName }}</strong>
         <br>
-        <strong>负责人姓名: {{ deleleDepartment.username }}</strong>
-        <br>
-        <strong>负责人邮箱:  {{ deleleDepartment.email }}</strong>
+        <strong>薪资情况: {{ delelePosition.amount }}</strong>
+
       </span>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="warning" @click="deleteDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="deleteOne(deleleDepartment.id)">确定</el-button>
+          <el-button type="primary" @click="deleteOne(delelePosition.id)">确定</el-button>
         </span>
       </template>
     </el-dialog>
-
     <el-dialog
         v-model="addDialogVisible"
-        title="添加部门"
+        title="添加职位"
         align-center
         style="border-radius: 20px; display: flex; justify-items: center; width: 700px"
         draggable
     >
-      <el-form :model="addForm" label-width="120px" style="margin-top: 20px" :rules="rule" ref="addFormRef">
-        <el-form-item prop="departmentName" label="部门名:">
-          <el-input v-model="addForm.departmentName" maxlength="30" placeholder="设置新部门名字" style="width: 260px">
+      <el-form :model="addForm" label-width="120px" style="margin-top: 20px"  ref="addFormRef">
+        <el-form-item prop="positionName" label="职位名:">
+          <el-input v-model="addForm.positionName" maxlength="30" placeholder="设置新职位名字" style="width: 260px">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item prop="email" label="负责人邮箱:">
-          <el-input v-model="addForm.email"
-                    @input="handleAddDepartmentFindInput(addForm.email)"
+        <el-form-item prop="salaryId" label="设置薪资等级:">
+          <el-input v-model="addForm.salaryId"
+                    @input="handleAddPositionFindInput(addForm.salaryId)"
                     clearable
-                    maxlength="30" placeholder="请为新部门选定负责人" style="width: 260px">
+                    maxlength="30" placeholder="请设置新职位的底薪等级" style="width: 260px">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
@@ -355,10 +321,10 @@ onMounted(() => {
                 <el-icon>
                   <user />
                 </el-icon>
-                邮箱拥有者
+                对应薪资
               </div>
             </template>
-            {{ findUsername }}
+            {{ findSalary }}
           </el-descriptions-item>
         </el-descriptions>
         <el-form-item>
@@ -371,7 +337,7 @@ onMounted(() => {
             addDialogVisible = false;
             addFormRef.resetFields();
             disableFlag=false;
-            findUsername = '未查询到此邮箱用户'
+            findSalary = '错误等级'
             color = 'var(--el-color-danger-light-9)'
           }" style="width: 100px;">取消</el-button>
         </el-form-item>
