@@ -53,7 +53,7 @@ public class AccountController {
 
     @GetMapping("/selectAccountPage/{pageNum}/{pageSize}")
     public String selectAccountPage(@PathVariable("pageNum") Integer pageNum,
-                               @PathVariable("pageSize") Integer pageSize) {
+                                    @PathVariable("pageSize") Integer pageSize) {
         Page<Account> page = new Page<>(pageNum, pageSize);
         IPage<Account> iPage = accountService.selectAccountPage(page);
         return RestBean.success(iPage).toJsonString();
