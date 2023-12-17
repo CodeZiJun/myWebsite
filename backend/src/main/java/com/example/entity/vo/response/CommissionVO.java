@@ -16,5 +16,6 @@ public class CommissionVO {
     String email;
     String departmentName;
     String positionName;
+    Integer archivesId;
     Date entryDate;
 }

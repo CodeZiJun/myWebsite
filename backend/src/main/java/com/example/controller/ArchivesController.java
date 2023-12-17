@@ -21,7 +21,7 @@ public class ArchivesController {
     @GetMapping(value = "/selectDetailByEmail/{email}")
     String selectDetailArchivesByEmail(@PathVariable @Email String email) {
         ArchivesVO vo = archivesService.selectDetailArchivesByEmail(email);
-        return vo == null ? RestBean.failure(400,"档案查询失败").toJsonString()
+        return vo == null ? RestBean.failure(400,"账户无档案").toJsonString()
                           : RestBean.success(vo).toJsonString();
 
     }
