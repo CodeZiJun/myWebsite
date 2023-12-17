@@ -1,8 +1,11 @@
 package com.example.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.entity.RestBean;
+import com.example.entity.dto.Account;
 import com.example.entity.dto.Position;
 import com.example.entity.dto.Salary;
 import com.example.entity.vo.request.PositionAddVO;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/position")
@@ -89,5 +94,36 @@ public class PositionController {
             message = "无法更改";
         }
         return message == null ? RestBean.success().toJsonString() : RestBean.failure(400, message).toJsonString();
+    }
+
+    @GetMapping("/charts")
+    public String charts() {
+        //以下是将所有用户按照角色分类可视化的数据封装
+        List<Position> positionList=service.list();
+        Set<String> names=positionList.stream().map(Position::getPositionName).collect(Collectors.toSet());
+        List<String> nameList= CollUtil.newArrayList(names);//角色列表
+        List<Dict> linelist =new ArrayList<>();//折线图
+        for(String name:nameList){
+            Integer s=0;
+            for(Position p : positionList){
+                if(p.getPositionName().equals(name)){
+
+                    Integer id=p.getSalaryId();
+                    Salary salary=salaryMapper.selectById(id);
+                    s =salary.getAmount();
+
+                }
+            }
+            Dict dict=Dict.create();
+            Dict line=dict.set("name",name).set("salary",s);
+
+            linelist.add(line);
+        }
+
+
+
+        Dict res = Dict.create().set("positionLine", linelist);
+        System.out.println(res);
+        return RestBean.success(res).toJsonString();
     }
 }

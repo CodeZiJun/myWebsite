@@ -19,6 +19,11 @@
           <div style="width: 100%; height: 400px" id="pie"></div>
         </el-card>
       </el-col>
+      <el-col :span="12">
+        <el-card>
+          <div style="width: 100%; height: 400px" id="pline"></div>
+        </el-card>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -129,6 +134,34 @@ const option2 = {
   ]
 }
 
+const option3 = {
+  title: {
+    text: '职位薪资对比图',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    left: 'left'
+  },
+  xAxis: {
+    type: 'category',
+    data: []
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: '薪资',
+      data: [],
+      type: 'line',
+      smooth: true
+    },
+  ]
+}
+
 export default {
   name: "Charts",
   data() {
@@ -137,10 +170,14 @@ export default {
   mounted() {  // 等待页面的元素全部加载完成之后再初始化
 
     // 折线图
-    let linetDom = document.getElementById('line');
-    let lineChart = echarts.init(linetDom);
-    lineChart.setOption(option)
+    let linetDom1 = document.getElementById('line');
+    let lineChart1 = echarts.init(linetDom1);
+    lineChart1.setOption(option)
 
+
+    let linetDom2 = document.getElementById('pline');
+    let lineChart2 = echarts.init(linetDom2);
+    lineChart2.setOption(option3)
     // 柱状图
     let barDom = document.getElementById('bar');
     let barChart = echarts.init(barDom);
@@ -156,7 +193,7 @@ export default {
         (res) => {
           option.xAxis.data = res.line.map(v => v.role)
           option.series[0].data = res.line.map(v => v.value)
-          lineChart.setOption(option)
+          lineChart1.setOption(option)
 
           option1.xAxis.data = res.line.map(v => v.role)
           option1.series[1].data = res.line.map(v => v.value)
@@ -165,6 +202,18 @@ export default {
           option2.series[0].data = res.line
           pieChart.setOption(option2)
           console.log(option.xAxis)
+        }, () => {
+          ElMessage.error("数据请求失败！")
+        })
+
+    get(`/api/position/charts`,
+        (res) => {
+          option3.xAxis.data = res.positionLine.map(v => v.name)
+          option3.series[0].data = res.positionLine.map(v => v.salary)
+          lineChart2.setOption(option3)
+
+
+          console.log(option3.xAxis)
         }, () => {
           ElMessage.error("数据请求失败！")
         })

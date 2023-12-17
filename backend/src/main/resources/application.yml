@@ -14,7 +14,7 @@ spring:
       key: coderzijunNB
       expire: 3
   datasource:
-    url: jdbc:mysql://sh-cynosdbmysql-grp-nlp7sgk2.sql.tencentcdb.com:23579/test
+    url: jdbc:mysql://sh-cynosdbmysql-grp-nlp7sgk2.sql.tencentcdb.com:23579/mainDB
     username: root
     password: Codezijun2004
     driver-class-name: com.mysql.cj.jdbc.Driver

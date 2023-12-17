@@ -131,6 +131,15 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         return accountMapper.selectOne(wrapper);
     }
 
+    /**
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<Account> selectAccountPage(Page<Account> page) {
+        return null;
+    }
+
 
     @Override
     public String resetConfirm(ConfirmResetVO vo) {
