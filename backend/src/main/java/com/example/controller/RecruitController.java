@@ -189,4 +189,37 @@ public class RecruitController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/getReply")
+    public ResponseEntity<Map<String, Object>> handle_viewReply(@RequestBody RequestApplication requestApplication){
+        Map<String, Object> response = new HashMap<>();
+        response.put("code",200);
+        String uname=requestApplication.getUsername();
+        String res=applicationService.viewReply(uname);
+        if(res!=null){
+            response.put("data",res);
+        }else {
+            response.put("data","");
+        }
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/setReply")
+    public ResponseEntity<Map<String, Object>> handle_setReply(@RequestBody RequestApplication requestApplication){
+        System.out.println(requestApplication);
+        Map<String, Object> response = new HashMap<>();
+        response.put("code",200);
+        String uname=requestApplication.getUsername();
+        String ccnt=requestApplication.getContent();
+        int ret=applicationService.insertReply(ccnt,uname);
+        int res=applicationService.updateStatus(uname);
+        if(ret==1){
+
+            response.put("data","success");
+        }else {
+            response.put("data","error");
+        }
+        return ResponseEntity.ok(response);
+    }
+
 }

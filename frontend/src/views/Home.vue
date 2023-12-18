@@ -1,5 +1,5 @@
 
-<script >
+<script>
 import stepImg1 from '@/assets/1.png'
 import stepImg2 from '@/assets/2.png';
 import stepImg3 from '@/assets/3.png';
@@ -12,9 +12,15 @@ import stepImg8 from '@/assets/8.png';
 import jayjaylu from "@/assets/programmer1.png"
 import codezj from "@/assets/programmer2.png"
 import windleaf from "@/assets/programmer3.png"
+import router from "@/router";
 
 export default {
   name: "Home",
+  methods: {
+    router() {
+      return router
+    }
+  },
   data:function (){
 
     return {
@@ -90,11 +96,11 @@ export default {
   <div :style="{ paddingTop: '56px'}">
     <header class="bg-primary py-3 shadow-sm fixed-navbar">
       <div class="container d-flex justify-content-between">
-        <h3 class="mb-0 text-white">人事管理系统</h3>
+        <h3 class="mb-0 text-white">南工管理系统</h3>
         <nav>
           <ul class="nav">
             <li class="nav-item">
-              <a class="nav-link text-white" href="">进入系统</a>
+              <el-button class="nav-link" size="large" @click="() => {router().push('/')}">进入系统</el-button>
             </li>
           </ul>
         </nav>
@@ -227,7 +233,7 @@ export default {
 }
 
 .contributors-section {
-  background-image: linear-gradient(to bottom right, #69a6e0, #e9ecef);
+
 }
 
 .contributor-card {
@@ -241,12 +247,10 @@ export default {
 
 
 body {
-  background-image: linear-gradient(to bottom, #85b7f1, #6c757d);
   min-height: 100vh;
   background-attachment: fixed;
 }
 footer{
-  background-image: linear-gradient(to bottom, #a2c4e8, #6c757d);
   min-height: 100vh;
   background-attachment: fixed;
 

@@ -1,8 +1,9 @@
 spring:
+  #邮箱信息
   mail:
     host: smtp.163.com
-    username: codezijun@163.com
-    password: DXNLMLRGVVYKNGFM
+    username:
+    password:
   rabbitmq:
     addresses: localhost
     username: guest
@@ -13,17 +14,18 @@ spring:
     jwt:
       key: coderzijunNB
       expire: 3
+  # 数据源信息
   datasource:
-    url: jdbc:mysql://sh-cynosdbmysql-grp-nlp7sgk2.sql.tencentcdb.com:23579/mainDB
-    username: root
-    password: Codezijun2004
+    url:
+    username:
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     static-path-pattern: /**
   web:
     resources:
       static-locations: classpath:/
-
+#文件配置路径
 uploadFile:
   path: C:/Users/13919/Desktop/Project/JavaWeb/myWebsite/resource/upload/
   maxSize: 50

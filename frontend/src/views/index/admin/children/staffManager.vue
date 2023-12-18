@@ -90,6 +90,7 @@ const submitAddForm = () => {
       post('/api/account/addAccount', {...addForm},
           () => {
             ElMessage.success("添加成功")
+            getdata()
           }, () => {ElMessage.error("添加失败")})
       getdata()
       addDialogVisible.value = false

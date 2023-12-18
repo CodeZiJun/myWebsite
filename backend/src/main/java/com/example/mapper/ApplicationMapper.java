@@ -55,10 +55,13 @@ public interface ApplicationMapper {
             "WHERE username = #{username}")
     int updateRequestApplication(RequestApplication requestApplication);
 
-    @Insert("INSERT INTO request_applications (reply) values (#{reply}) WHERE username=#{uname}")
+    @Update("UPDATE request_applications set reply=(#{reply}) where username=#{uname}")
     int insertReply(String reply,String uname);
 
     @Select("SELECT reply FROM request_applications where username=#{uname}")
     String viewReply(String uname);
+
+    @Update("UPDATE recruitment_applications set status='已处理' where applicant_username=#{uname}")
+    int updateStatus(String uname);
 
 }

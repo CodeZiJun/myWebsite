@@ -15,9 +15,9 @@ import {
 } from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
 import {getDescriptions, getNames} from "@/utils/routeUtils";
-import {ref, onMounted} from "vue";
+import {ref, onMounted, inject} from "vue";
 import screenfull from "screenfull";
-
+const goRefresh = inject('reload')
 const route = useRoute()
 let descriptions = ref()
 let routeNames = ref()
@@ -87,7 +87,7 @@ onMounted(
               <el-menu-item index="/index/service/proof">
                 <template #title>
                   <el-icon><Printer /></el-icon>
-                  <span>教职工证明</span>
+                  <span>工作报表</span>
                 </template>
               </el-menu-item>
             </el-menu-item-group>
@@ -141,7 +141,7 @@ onMounted(
             </template>
             <el-menu-item index="/index/salary/mySalary">
               <el-icon><CreditCard /></el-icon>
-              <span>我的薪资</span>
+              <span>薪资公示</span>
             </el-menu-item>
           </el-sub-menu>
 

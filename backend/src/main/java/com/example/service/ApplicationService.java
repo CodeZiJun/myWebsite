@@ -55,4 +55,5 @@ public class ApplicationService {
         return applicationMapper.viewReply(uname);
     }
 
+    public int updateStatus(String uname){return applicationMapper.updateStatus(uname);}
 }
