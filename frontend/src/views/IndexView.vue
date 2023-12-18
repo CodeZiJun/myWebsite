@@ -23,7 +23,7 @@ let descriptions = ref()
 let routeNames = ref()
 let isCollapse = ref(false);
 let asideWidth = ref('200px');
-
+const isAdmin = ref(false)
 // const accountName = JSON.parse(
 //     (sessionStorage.getItem(accountInfoItemName) ? sessionStorage.getItem(accountInfoItemName)
 //         : localStorage.getItem(accountInfoItemName))).username
@@ -49,8 +49,11 @@ router.afterEach((to, from) => {
 onMounted(
     () => {
       myInfo.value = getStorageInfoJson()
+      isAdmin.value = myInfo.value.role === "admin"
+      console.log(isAdmin.value)
     }
 )
+
 </script>
 
 <template>
@@ -156,7 +159,7 @@ onMounted(
               <span>招聘申请</span>
             </el-menu-item>
           </el-sub-menu>
-
+        <span v-if="isAdmin">
           <el-sub-menu index="/admin">
             <template #title>
               <el-icon><Management /></el-icon>
@@ -183,6 +186,8 @@ onMounted(
               <span>任命管理</span>
             </el-menu-item>
           </el-sub-menu>
+        </span>
+
         </el-menu>
     </el-aside>
 

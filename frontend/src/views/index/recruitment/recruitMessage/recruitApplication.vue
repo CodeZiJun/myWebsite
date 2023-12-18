@@ -12,8 +12,8 @@
             <template #default="scope">
                 <el-space>
                 <el-button size="small" @click="editApplication(scope.row)">修改</el-button>
-                <el-button size="small" @click="deleteApplication(scope.row)">清除</el-button>
-                <el-button size="small" @click="replyApplication(scope.row)">回复</el-button>
+                  <el-button size="small" @click="deleteApplication(scope.row)">清除</el-button>
+                    <el-button size="small" @click="replyApplication(scope.row)">回复</el-button>
                 </el-space>
             </template>
             </el-table-column>
@@ -117,6 +117,7 @@
   import simpleDialog from "./base/simpleDialog.vue";
   import editapplyDialog from "./base/editapplyDialog.vue";
   import replyDialog from "./base/replyDialog.vue";
+  import {getStorageInfoJson, myInfo} from "@/utils/profileUtils";
   
 
   const currentPage = ref(1);
@@ -133,6 +134,7 @@
   let displayView=ref(false);
   let displayEdit=ref(false);
   let displayReply=ref(false);
+  const isAdmin = ref(false)
   let form = reactive({
     content: '',
     position:'',
@@ -187,8 +189,14 @@
               console.error("An error occurred:", error);
           }
       }
-  );
-  
+  )
+  onMounted(
+      () => {
+        myInfo.value = getStorageInfoJson()
+        isAdmin.value = myInfo.value.role === "admin"
+        console.log(isAdmin.value)
+      }
+  )
   
   
   function searchMsg(){

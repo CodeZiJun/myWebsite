@@ -15,8 +15,11 @@
         <template #default="scope">
           <el-space>
             <el-button size="small" @click="viewNotice(scope.row)">查看</el-button>
-            <el-button size="small" @click="editNotice(scope.row)">编辑</el-button>
-            <el-button size="small" @click="deleteNotice(scope.row)">删除</el-button>
+            <span v-if="isAdmin">
+              <el-button size="small" @click="editNotice(scope.row)">编辑</el-button>
+              <el-button size="small" @click="deleteNotice(scope.row)">删除</el-button>
+            </span>
+
           </el-space>
         </template>
       </el-table-column>
@@ -99,11 +102,12 @@ import { get,post } from "@/net";
 import axios from 'axios'
 import simpleDialog from "./base/simpleDialog.vue";
 import editmsgDialog from "./base/editmsgDialog.vue";
+import {getStorageInfoJson, myInfo} from "@/utils/profileUtils";
 
 
 const currentPage = ref(1);
 const pageSize = ref(10);
-
+const isAdmin = ref(false)
 let notices = ref([]);
 let src_notices=ref([]);
 let msgContent=ref('');
@@ -300,5 +304,13 @@ const viewNotice =(notice) => {
     });
   });
 }
+
+onMounted(
+    () => {
+      myInfo.value = getStorageInfoJson()
+      isAdmin.value = myInfo.value.role === "admin"
+      console.log(isAdmin.value)
+    }
+)
 
 </script>
