@@ -135,6 +135,34 @@ const router = createRouter({
                         }
                     ]
                 },{
+                    path: 'recruitment',
+                    name: 'index-recruitment',
+                    meta: {
+                        description: '招聘资讯',
+                        parentRouteName: 'index'
+                    },
+                    component: () => import('@/views/index/recruitment/RecruitPage.vue'),
+                    children: [
+                        {
+                            path: 'recruit-message',
+                            name: 'index-recruitment-recruitMessage',
+                            meta: {
+                                description: '招聘公告',
+                                parentRouteName: 'index-recruitment'
+                            },
+                            component: () => import('@/views/index/recruitment/recruitMessage/recruitMessageDetail.vue')
+                        },
+                        {
+                            path: 'recruit-application',
+                            name: 'index-recruitment-recruitApplication',
+                            meta: {
+                                description: '招聘申请',
+                                parentRouteName: 'index-recruitment'
+                            },
+                            component: () => import('@/views/index/recruitment/recruitMessage/recruitApplication.vue')
+                        }
+                    ]
+                },{
                     path: '/admin',
                     name: 'index-admin',
                     meta: {

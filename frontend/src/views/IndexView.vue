@@ -4,13 +4,13 @@ import router from "@/router";
 import {avatarRef, getStorageInfoJson, myInfo} from '@/utils/profileUtils'
 import {
   ArrowRight,
-  Avatar, CreditCard,
+  Avatar, ChatLineSquare, CreditCard,
   Fold, FullScreen,
   Grid, Guide,
   Histogram, HomeFilled,
   List, Management,
   Memo,
-  MessageBox, Money, Printer,
+  MessageBox, Money, Postcard, Printer, Suitcase,
   Tickets
 } from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
@@ -139,6 +139,21 @@ onMounted(
             <el-menu-item index="/index/salary/mySalary">
               <el-icon><CreditCard /></el-icon>
               <span>我的薪资</span>
+            </el-menu-item>
+          </el-sub-menu>
+
+          <el-sub-menu index="/index/recruitment">
+            <template #title>
+              <el-icon><Suitcase /></el-icon>
+              <span>招聘资讯</span>
+            </template>
+            <el-menu-item index="/index/recruitment/recruit-message">
+              <el-icon><ChatLineSquare /></el-icon>
+              <span>招聘公告</span>
+            </el-menu-item>
+            <el-menu-item index="/index/recruitment/recruit-application">
+              <el-icon><Postcard/></el-icon>
+              <span>招聘申请</span>
             </el-menu-item>
           </el-sub-menu>
 
