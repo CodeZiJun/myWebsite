@@ -9,4 +9,6 @@ import com.example.entity.vo.response.CommissionVO;
 public interface CommissionService extends IService<Account> {
     IPage<CommissionVO> selectCommissionByDetailPage(Page<CommissionVO> page, String detail, Integer flag);
     IPage<CommissionVO> selectCommissionPage(Page<CommissionVO> page, Integer flag);
+    String commissionPosition(String email, Integer positionId);
+    String commissionDepartment(String email,Integer departmentId);
 }

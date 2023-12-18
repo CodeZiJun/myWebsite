@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
 import com.example.entity.vo.response.CommissionVO;
 import com.example.mapper.AccountMapper;
+import com.example.mapper.ArchivesMapper;
+import com.example.service.AccountService;
+import com.example.service.ArchivesService;
 import com.example.service.CommissionService;
 import com.github.yulichang.query.MPJQueryWrapper;
 import jakarta.annotation.Resource;
@@ -16,6 +19,11 @@ public class CommissionServiceImpl extends ServiceImpl<AccountMapper, Account> i
 
     @Resource
     AccountMapper accountMapper;
+    @Resource
+    ArchivesService archivesService;
+    @Resource
+    AccountService accountService;
+
     @Override
     public IPage<CommissionVO> selectCommissionByDetailPage(Page<CommissionVO> page, String detail, Integer flag) {
         if(!"".equals(detail)) {
@@ -78,5 +86,25 @@ public class CommissionServiceImpl extends ServiceImpl<AccountMapper, Account> i
                 .leftJoin("db_department dep on arc.department_id = dep.id")
                 .leftJoin("db_position pos on arc.position_id = pos.id");
         return getCommissionVOIPage(page, flag, wrapper);
+    }
+
+    @Override
+    public String commissionPosition(String email, Integer positionId) {
+        Account account = accountService.selectOneByEmail(email);
+        if(account == null)
+            return "此邮箱用户不存在";
+        Integer archivesId = account.getArchivesId();
+        archivesService.update().eq("id", archivesId).set("position_id", positionId).update();
+        return null;
+    }
+
+    @Override
+    public String commissionDepartment(String email, Integer departmentId) {
+        Account account = accountService.selectOneByEmail(email);
+        if(account == null)
+            return "此邮箱用户不存在";
+        Integer archivesId = account.getArchivesId();
+        archivesService.update().eq("id", archivesId).set("department_id", departmentId).update();
+        return null;
     }
 }

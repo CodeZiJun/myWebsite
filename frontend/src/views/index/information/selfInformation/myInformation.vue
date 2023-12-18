@@ -18,6 +18,7 @@ import {ElMessage} from "element-plus";
 const noArchives = ref(true)
 const archivesVO = ref({
 })
+let loading = ref(false)
 const form = reactive({
   realName: '',
   telephone: '',
@@ -78,9 +79,11 @@ const getArchives = (email) => {
       (data) => {
         noArchives.value = false
         archivesVO.value = data
+        loading.value = false
       }, () => {
         noArchives.value = true;
         ElMessage.error("账户无档案")
+        loading.value = false
       })
 }
 onMounted(() => {
@@ -102,6 +105,7 @@ onMounted(
     }
 )
 const refresh = () => {
+  loading.value = true
   myInfo.value = getStorageInfoJson()
   getArchives(myInfo.value.email)
 }
@@ -188,7 +192,7 @@ const submitForm = () => {
         </div>
       </div>
     </div>
-    <div v-else >
+    <div v-else v-loading="loading">
       <div>
         <el-descriptions
             title="职工个人信息"

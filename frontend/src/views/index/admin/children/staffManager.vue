@@ -168,7 +168,8 @@ const editOpen = (row) => {
     openEditTip()
     flagOpenTip ++
   }
-  row.status = true
+  if (row.email !== myInfo.value.email)
+    row.status = true
 }
 const editClose = (currentRow, oldCurrentRow) => {
   if(oldCurrentRow!==null){

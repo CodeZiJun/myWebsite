@@ -1,14 +1,58 @@
 <script setup>
 import {reactive, ref, onMounted} from "vue";
-import {getWithData} from "@/net";
+import {get, getWithData, post} from "@/net";
 import {ElMessage} from "element-plus";
+import {User} from "@element-plus/icons-vue";
+import {getStorageInfoJson, myInfo} from "@/utils/profileUtils";
 
+const tempEmail = ref("")
 let show = ref(false)
 let searchText = ref("")
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalPage = ref(20)
+const setDepDialogVisible = ref(false)
+const setPosDialogVisible = ref(false)
+const findDep = ref("错误编号")
+const findPos = ref("错误编号")
+const setDepFormRef = ref()
+const setPosFormRef = ref()
+const setDepDisableFlag = ref(true)
+const setDepcolor = ref("var(--el-color-danger-light-9)")
 let flag = ref(0)
+const validatorDepartmentId = (rule, value, callback) => {
+  if(value === ''){
+    callback(new Error('请输入部门编号'))
+  } else if (!/^(1000|1[0-9]{3}|2000)$/.test(value)) {
+    callback(new Error('部门编号格式不正确'))
+  } else {
+    callback()
+  }
+}
+const validatorPositionId = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入职位编号'))
+  } else if (!/^([1-9]|[1-9][0-9])$/.test(value)) {
+    callback(new Error('职位编号格式不正确'))
+  } else {
+    callback()
+  }
+}
+
+const rule = {
+  departmentId: [
+    { validator: validatorDepartmentId, required: true, trigger: ['blur', 'change'] },
+  ],
+  positionId: [
+    { validator: validatorPositionId, required: true, trigger: ['blur', 'change'] },
+  ]
+}
+const setDepForm = reactive({
+  departmentId: ''
+})
+const setPosForm = reactive({
+  positionId: ''
+})
 let details = new reactive({
   detail: null
 })
@@ -31,6 +75,18 @@ const handleCurrentChange = (val) => {
   commissionList.current = val
   getdata()
 }
+const validateDepartmentId = (value) => {
+  const checkReg = /^(1000|1[0-9]{3}|2000)$/ ;
+  if(value === "" || value === null)
+    return false;
+  else return checkReg.test(value);
+}
+const validatePositionId = (value) => {
+  const checkReg = /^([1-9]|[1-9][0-9])$/ ;
+  if(value === "" || value === null)
+    return false;
+  else return checkReg.test(value);
+}
 const getdata = () => {
   getWithData(`/api/commission/selectPage/${commissionList.current}/${commissionList.size}/${flag.value}`,
       details
@@ -44,6 +100,81 @@ const getdata = () => {
         ElMessage.error("数据请求失败！")
       })
 }
+const handleSetDepFindInput = (text) => {
+  if(validateDepartmentId(text)){
+    get(`/api/commission/selectDepartmentById/${text}`, (data) => {
+          findDep.value = data.departmentName
+          setDepDisableFlag.value = true;
+          setDepcolor.value = ""
+        }, () => {
+          findDep.value = "错误编号"
+          setDepDisableFlag.value = false;
+          setDepcolor.value = "var(--el-color-danger-light-9)"
+        }
+    )
+  }
+}
+const handleSetPosFindInput = (text) => {
+  if(validatePositionId(text)){
+    get(`/api/commission/selectPositionById/${text}`, (data) => {
+          findPos.value = data.positionName
+          setDepDisableFlag.value = true;
+          setDepcolor.value = ""
+        }, () => {
+          findPos.value = "错误编号"
+          setDepDisableFlag.value = false;
+          setDepcolor.value = "var(--el-color-danger-light-9)"
+        }
+    )
+  }
+}
+const submitSetDepForm = () => {
+  setDepFormRef.value.validate((valid) => {
+    if (valid) {
+      get(`/api/archives/commissionDepartment/${tempEmail.value}/${setDepForm.departmentId}`,
+          () => {
+            getdata()
+            ElMessage.success("任命成功")
+          }, () => {
+            getdata();
+            ElMessage.error("任命失败")})
+      setDepDialogVisible.value = false
+      setDepFormRef.value.resetFields();
+    } else {
+      ElMessage.warning("请检查表单内容！")
+    }
+  })
+  setDepDisableFlag.value = false
+  findDep.value = "错误编号"
+  setDepcolor.value = "var(--el-color-danger-light-9)"
+}
+
+const submitSetPosForm = () => {
+  setPosFormRef.value.validate((valid) => {
+    if (valid) {
+      get(`/api/archives/commissionPosition/${tempEmail.value}/${setPosForm.positionId}`,
+          () => {
+            getdata()
+            ElMessage.success("任命成功")
+          }, () => {
+            getdata();
+            ElMessage.error("任命失败")})
+      setPosDialogVisible.value = false
+      setPosFormRef.value.resetFields();
+    } else {
+      ElMessage.warning("请检查表单内容！")
+    }
+  })
+  setDepDisableFlag.value = false
+  findPos.value = "错误编号"
+  setDepcolor.value = "var(--el-color-danger-light-9)"
+}
+onMounted(
+    () => {
+      myInfo.value = getStorageInfoJson()
+    }
+)
+
 const selectAll = () => {flag.value = 0; getdata()}
 const selectNArc = () => {flag.value = 1; getdata();}
 const selectNDepNPos = () => {flag.value = 2; getdata(); show.value =false}
@@ -95,8 +226,8 @@ onMounted(() => {
       <el-table-column prop="entryDate" label="入职时间" min-width="160" align="center"></el-table-column>
       <el-table-column label="设置" align="center" width="150">
         <template v-slot="scope" #default="{row}">
-          <el-button size="small" type="primary" :disabled="scope.row.archivesId === null" plain>部门</el-button>
-          <el-button size="small" type="warning" :disabled="scope.row.archivesId === null" plain>职位</el-button>
+          <el-button size="small" type="primary" :disabled="scope.row.archivesId === null" @click="() => {tempEmail = scope.row.email;setDepDialogVisible=true}" plain>部门</el-button>
+          <el-button size="small" type="warning" :disabled="scope.row.archivesId === null" @click="() => {tempEmail = scope.row.email;setPosDialogVisible=true}" plain>职位</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -112,9 +243,125 @@ onMounted(() => {
       >
       </el-pagination>
     </div>
+    <el-dialog
+        v-model="setDepDialogVisible"
+        title="任命部门"
+        align-center
+        style="border-radius: 20px; display: flex; justify-items: center; width: 700px"
+        draggable
+    >
+      <el-form :model="setDepForm" label-width="120px" style="margin-top: 20px" :rules="rule" ref="setDepFormRef">
+        <el-form-item prop="departmentId" label="设置部门:">
+          <el-input v-model="setDepForm.departmentId"
+                    @input="handleSetDepFindInput(setDepForm.departmentId)"
+                    clearable
+                    maxlength="30" placeholder="请输入部门编号" style="width: 260px">
+            <template #prefix>
+              <el-icon><User /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-descriptions
+            :column="1"
+            border
+            style="margin-bottom: 10px"
+        >
+          <el-descriptions-item
+              label-class-name="my-label"
+              class-name="my-content">
+            <template #label>
+              <div class="cell-item">
+                <el-icon>
+                  <user />
+                </el-icon>
+                对应部门
+              </div>
+            </template>
+            {{ findDep }}
+          </el-descriptions-item>
+        </el-descriptions>
+        <el-form-item>
+          <el-button type="primary"
+                     @click="submitSetDepForm"
+                     :disabled = !setDepDisableFlag
+                     style="width: 100px">确认</el-button>
+          <el-button type="warning"
+                     @click="() => {
+            setDepDialogVisible = false;
+            setDepFormRef.resetFields();
+            setDepDisableFlag=false;
+            findDep = '错误编号'
+            setDepcolor = 'var(--el-color-danger-light-9)'
+          }" style="width: 100px;">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
+    <el-dialog
+        v-model="setPosDialogVisible"
+        title="任命职位"
+        align-center
+        style="border-radius: 20px; display: flex; justify-items: center; width: 700px"
+        draggable
+    >
+      <el-form :model="setPosForm" label-width="120px" style="margin-top: 20px" :rules="rule" ref="setPosFormRef">
+        <el-form-item prop="positionId" label="设置职位:">
+          <el-input v-model="setPosForm.positionId"
+                    @input="handleSetPosFindInput(setPosForm.positionId)"
+                    clearable
+                    maxlength="30" placeholder="请输入职位编号" style="width: 260px">
+            <template #prefix>
+              <el-icon><User /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-descriptions
+            :column="1"
+            border
+            style="margin-bottom: 10px"
+        >
+          <el-descriptions-item
+              label-class-name="my-label"
+              class-name="my-content">
+            <template #label>
+              <div class="cell-item">
+                <el-icon>
+                  <user />
+                </el-icon>
+                对应职位
+              </div>
+            </template>
+            {{ findPos }}
+          </el-descriptions-item>
+        </el-descriptions>
+        <el-form-item>
+          <el-button type="primary"
+                     @click="submitSetPosForm"
+                     :disabled = !setDepDisableFlag
+                     style="width: 100px">确认</el-button>
+          <el-button type="warning"
+                     @click="() => {
+            setPosDialogVisible = false;
+            setPosFormRef.resetFields();
+            setDepDisableFlag=false;
+            findPos = '错误编号'
+            setDepcolor = 'var(--el-color-danger-light-9)'
+          }" style="width: 100px;">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <style scoped>
-
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+:deep(.my-label) {
+  background: var(--el-color-success-light-9) !important;
+  width: 120px;
+}
+:deep(.my-content) {
+  background: v-bind(setDepcolor);
+}
 </style>
