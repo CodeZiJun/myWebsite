@@ -5,7 +5,7 @@
 * `RabbitMQ`使用默认配置
 * `Redis`使用默认配置并已开启
 * 确认`JDK version >= 17`
-* 邮箱需正确配置无需更改
+* 邮箱需正确配置
 
 ## 配置文件说明
 * application.yml中请正确配置
